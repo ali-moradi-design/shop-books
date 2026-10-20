@@ -9,6 +9,7 @@
     "start": "node dist/server.js",
     "lint": "eslint \"src/**/*.{ts,js}\" \"tests/**/*.{ts,js}\"",
     "format": "prettier --write \"src/**/*.{ts,js,json}\" \"*.md\"",
+    "dev:db": "tsx src/scripts/dev-db.ts",
     "seed": "tsx src/scripts/seed.ts",
     "test": "vitest run",
     "test:watch": "vitest",
