@@ -77,7 +77,7 @@ export class PayOrderUseCase {
       if (this.notifications) {
         await this.notifications.send({
           subject: `Order ${saved.id} paid`,
-          body: `Payment confirmed for order ${saved.id} (total ${saved.totalAmount})`,
+          body: `Payment confirmed for order ${saved.id} (total ${(saved.totalAmount / 100).toFixed(2)})`,
           meta: { orderId: saved.id, userId: saved.user },
         });
       }

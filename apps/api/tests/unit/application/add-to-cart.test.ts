@@ -10,7 +10,7 @@ describe('AddToCartUseCase', () => {
     title: 'Clean Code',
     author: 'Uncle Bob',
     description: 'x',
-    price: 30,
+    price: 3000,
     currency: 'USD',
     stock: 5,
     featured: false,

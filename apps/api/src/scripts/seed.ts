@@ -492,6 +492,7 @@ export async function runSeed(options: SeedOptions = {}): Promise<void> {
     const featured = FEATURED_ISBNS.has(b.isbn);
     await repos.books.upsertByIsbn(b.isbn, {
       ...b,
+      price: Math.round(b.price * 100),
       coverImageUrl: coverUrl(b.isbn),
       currency: 'USD',
       featured,
@@ -504,15 +505,15 @@ export async function runSeed(options: SeedOptions = {}): Promise<void> {
       code: 'WELCOME10',
       type: 'percent' as const,
       value: 10,
-      minOrderAmount: 20,
+      minOrderAmount: 2000,
       maxUses: 1000,
       isActive: true,
     },
     {
       code: 'FLAT5',
       type: 'fixed' as const,
-      value: 5,
-      minOrderAmount: 15,
+      value: 500,
+      minOrderAmount: 1500,
       maxUses: 500,
       isActive: true,
     },
@@ -532,7 +533,7 @@ async function main() {
   const bookCount = await repos.books.count();
   console.log(`Books upserted (catalog count: ${bookCount}); featured: ${FEATURED_ISBNS.size}`);
   console.log('Admin user: admin@bookstore.local / Admin123!');
-  console.log('Sample discounts: WELCOME10 (10%), FLAT5 ($5)');
+  console.log('Sample discounts: WELCOME10 (10%), FLAT5 ($5 off)');
   console.log('Seed complete.');
   process.exit(0);
 }

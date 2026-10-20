@@ -14,10 +14,10 @@ describe('cart totals', () => {
     expect(merged[0].quantity).toBe(3);
 
     const sub = computeSubtotal([
-      { bookId: 'a', title: 'A', price: 10.5, quantity: 2 },
+      { bookId: 'a', title: 'A', price: 1050, quantity: 2 },
     ]);
-    expect(sub).toBe(21);
-    expect(computeOrderTotal(21, 5)).toBe(16);
+    expect(sub).toBe(2100);
+    expect(computeOrderTotal(2100, 500)).toBe(1600);
   });
 
   it('rejects empty cart', () => {

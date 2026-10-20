@@ -5,9 +5,10 @@ import { normalizeIsbn, isValidIsbn } from '../../../src/domain/shared/Isbn';
 import { DomainError } from '../../../src/domain/shared/DomainError';
 
 describe('value helpers', () => {
-  it('Money rounds and subtracts', () => {
-    expect(Money.of(10.125).amount).toBe(10.13);
-    expect(Money.of(10).subtract(Money.of(3)).amount).toBe(7);
+  it('Money holds integer minor units, rounds percentages and subtracts', () => {
+    expect(() => Money.of(10.5)).toThrow();
+    expect(Money.of(Money.round(1012.5)).minor).toBe(1013);
+    expect(Money.of(1000).subtract(Money.of(300)).minor).toBe(700);
   });
 
   it('Email / ISBN', () => {

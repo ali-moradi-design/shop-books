@@ -7,10 +7,10 @@ function pendingOrder(): Order {
   return {
     id: 'o1',
     user: 'u1',
-    items: [{ book: 'b1', title: 'T', price: 10, quantity: 1 }],
-    subtotalAmount: 10,
+    items: [{ book: 'b1', title: 'T', price: 1000, quantity: 1 }],
+    subtotalAmount: 1000,
     discountAmount: 0,
-    totalAmount: 10,
+    totalAmount: 1000,
     status: 'pending_payment',
     payment: { method: 'fake', status: 'pending' },
     shippingAddress: {

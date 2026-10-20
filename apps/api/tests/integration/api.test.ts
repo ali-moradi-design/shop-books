@@ -130,7 +130,7 @@ describe('Bookstore API (integration)', () => {
           title: 'Denied',
           author: 'X',
           description: 'Nope',
-          price: 10,
+          price: 1000,
           stock: 1,
         })
         .expect(403);
@@ -166,7 +166,7 @@ describe('Bookstore API (integration)', () => {
           author: 'Tester',
           description: 'Created in integration test',
           isbn: `978${Date.now().toString().slice(-10)}`,
-          price: 19.99,
+          price: 1999,
           stock: 5,
           categories: ['test'],
         })
@@ -177,10 +177,10 @@ describe('Bookstore API (integration)', () => {
       const updated = await ctx.request
         .patch(`/api/v1/books/${id}`)
         .set(authHeader(ctx.adminToken))
-        .send({ price: 21.5, stock: 8 })
+        .send({ price: 2150, stock: 8 })
         .expect(200);
 
-      expect(updated.body.data.price).toBe(21.5);
+      expect(updated.body.data.price).toBe(2150);
       expect(updated.body.data.stock).toBe(8);
     });
   });
@@ -217,7 +217,7 @@ describe('Bookstore API (integration)', () => {
 
       const order = checkout.body.data;
       expect(order.status).toBe('pending_payment');
-      expect(order.totalAmount).toBeCloseTo(bookPrice * 2, 2);
+      expect(order.totalAmount).toBe(bookPrice * 2);
 
       const paid = await ctx.request
         .post(`/api/v1/orders/${order.id}/pay`)
@@ -239,7 +239,7 @@ describe('Bookstore API (integration)', () => {
           author: 'Limited',
           description: 'Only one copy',
           isbn: `979${Date.now().toString().slice(-10)}`,
-          price: 25,
+          price: 2500,
           stock: 1,
         })
         .expect(201);
@@ -325,9 +325,9 @@ describe('Bookstore API (integration)', () => {
       const customer = await registerCustomer(ctx.request, `disc_${Date.now()}`);
       const books = await ctx.request.get('/api/v1/books?limit=20').expect(200);
       const book =
-        books.body.data.find((b: { price: number; stock: number }) => b.price >= 20 && b.stock > 0) ??
+        books.body.data.find((b: { price: number; stock: number }) => b.price >= 2000 && b.stock > 0) ??
         books.body.data[0];
-      const qty = book.price >= 20 ? 1 : 2;
+      const qty = book.price >= 2000 ? 1 : 2;
 
       await ctx.request
         .post('/api/v1/cart/items')

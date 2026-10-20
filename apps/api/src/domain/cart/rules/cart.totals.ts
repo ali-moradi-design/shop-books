@@ -49,9 +49,9 @@ export function computeSubtotal(lines: PricedLine[], currency = 'USD'): number {
   for (const line of lines) {
     total = total.add(Money.of(line.price, currency).multiply(line.quantity));
   }
-  return total.amount;
+  return total.minor;
 }
 
 export function computeOrderTotal(subtotal: number, discountAmount: number, currency = 'USD'): number {
-  return Money.of(subtotal, currency).subtract(Money.of(discountAmount, currency)).amount;
+  return Money.of(subtotal, currency).subtract(Money.of(discountAmount, currency)).minor;
 }

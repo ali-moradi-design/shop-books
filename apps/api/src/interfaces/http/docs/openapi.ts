@@ -102,7 +102,8 @@ export const openApiSpec = {
           "type": "string"
         },
         "price": {
-          "type": "number"
+          "type": "integer",
+          "description": "Minor units (cents)"
         },
         "currency": {
           "type": "string"

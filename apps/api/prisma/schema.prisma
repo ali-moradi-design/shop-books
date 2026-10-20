@@ -125,7 +125,7 @@ model Book {
   author        String
   description   String
   isbn          String?   @unique
-  price         Float
+  price         Int // minor units (cents)
   currency      String    @default("USD")
   stock         Int       @default(0)
   coverImageUrl String?
@@ -151,10 +151,10 @@ model Order {
   id                 String        @id @default(cuid())
   userId             String
   user               User          @relation(fields: [userId], references: [id])
-  subtotalAmount     Float
+  subtotalAmount     Int
   discountCode       String?
-  discountAmount     Float         @default(0)
-  totalAmount        Float
+  discountAmount     Int           @default(0)
+  totalAmount        Int
   status             OrderStatus   @default(pending_payment)
   paymentMethod      String        @default("fake")
   paymentStatus      PaymentStatus @default(pending)
@@ -187,7 +187,7 @@ model OrderItem {
   bookId   String
   book     Book   @relation(fields: [bookId], references: [id])
   title    String
-  price    Float
+  price    Int
   quantity Int
 
   @@index([orderId])
@@ -248,8 +248,8 @@ model Discount {
   id             String       @id @default(cuid())
   code           String       @unique
   type           DiscountType
-  value          Float
-  minOrderAmount Float?
+  value          Float // percent, or minor units when type is fixed
+  minOrderAmount Int?
   maxUses        Int?
   usedCount      Int          @default(0)
   startsAt       DateTime?

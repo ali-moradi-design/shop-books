@@ -12,7 +12,8 @@ export const createBookSchema = z.object({
   author: z.string().min(1).max(200),
   description: z.string().min(1),
   isbn: z.string().min(5).max(20).optional(),
-  price: z.number().nonnegative(),
+  /** Minor units (cents). */
+  price: z.number().int().nonnegative(),
   currency: z.string().length(3).optional(),
   stock: z.number().int().nonnegative().default(0),
   coverImageUrl: coverImageUrlSchema.optional(),
@@ -28,8 +29,9 @@ export const idParamSchema = z.object({ id: z.string().min(1) });
 export const listBooksQuerySchema = z.object({
   q: z.string().optional(),
   category: z.string().optional(),
-  minPrice: z.coerce.number().nonnegative().optional(),
-  maxPrice: z.coerce.number().nonnegative().optional(),
+  // Minor units (cents)
+  minPrice: z.coerce.number().int().nonnegative().optional(),
+  maxPrice: z.coerce.number().int().nonnegative().optional(),
   inStock: z
     .enum(['true', 'false'])
     .optional()
