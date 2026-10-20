@@ -132,6 +132,9 @@ model Book {
   categories    String[]  @default([])
   featured      Boolean   @default(false)
   featuredOrder Int       @default(0)
+  series        String?
+  seriesNumber  Int?
+  sample        String? // first pages, shown by "Look inside"
   deletedAt     DateTime?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
@@ -145,6 +148,7 @@ model Book {
   @@index([price])
   @@index([title])
   @@index([author])
+  @@index([series])
 }
 
 model Order {

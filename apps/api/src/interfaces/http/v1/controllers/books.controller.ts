@@ -7,6 +7,8 @@ export const list = asyncHandler(async (req: Request, res: Response) => {
   const result = await bookService.list({
     q: req.query.q as string | undefined,
     category: req.query.category as string | undefined,
+    author: req.query.author as string | undefined,
+    series: req.query.series as string | undefined,
     minPrice: req.query.minPrice !== undefined ? Number(req.query.minPrice) : undefined,
     maxPrice: req.query.maxPrice !== undefined ? Number(req.query.maxPrice) : undefined,
     inStock: req.query.inStock as boolean | undefined,
@@ -24,9 +26,13 @@ export const listFeatured = asyncHandler(async (_req: Request, res: Response) =>
   res.json({ data: presentBooks(data) });
 });
 
+export const facets = asyncHandler(async (_req: Request, res: Response) => {
+  res.json({ data: await bookService.facets() });
+});
+
 export const getById = asyncHandler(async (req: Request, res: Response) => {
   const book = await bookService.getById(String(req.params.id));
-  res.json({ data: presentBook(book) });
+  res.json({ data: presentBook(book, { withSample: true }) });
 });
 
 export const create = asyncHandler(async (req: Request, res: Response) => {
@@ -36,7 +42,7 @@ export const create = asyncHandler(async (req: Request, res: Response) => {
 
 export const update = asyncHandler(async (req: Request, res: Response) => {
   const book = await bookService.update(String(req.params.id), req.body);
-  res.json({ data: presentBook(book) });
+  res.json({ data: presentBook(book, { withSample: true }) });
 });
 
 export const remove = asyncHandler(async (req: Request, res: Response) => {

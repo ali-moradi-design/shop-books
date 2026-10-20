@@ -14,6 +14,10 @@ export interface BookDto {
   categories?: string[];
   featured: boolean;
   featuredOrder?: number;
+  series?: string;
+  seriesNumber?: number;
+  /** Present only on the single-book endpoint. */
+  sample?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -32,6 +36,8 @@ export function toBookDto(book: Book): BookDto {
     categories: book.categories,
     featured: book.featured,
     featuredOrder: book.featuredOrder,
+    series: book.series,
+    seriesNumber: book.seriesNumber,
     createdAt: book.createdAt,
     updatedAt: book.updatedAt,
   };

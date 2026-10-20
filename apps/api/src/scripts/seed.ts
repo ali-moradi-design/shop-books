@@ -55,12 +55,12 @@ function coverUrl(isbn: string): string {
 
 /** 40 distinct books with real/public ISBNs for Open Library covers */
 const FEATURED_ISBNS = new Set([
-  '9780201616224', // The Pragmatic Programmer
-  '9780132350884', // Clean Code
-  '9781449373320', // DDIA
   '9780062316097', // Sapiens
   '9780547928227', // The Hobbit
   '9780441172719', // Dune
+  '9780060883287', // One Hundred Years of Solitude
+  '9780141439518', // Pride and Prejudice
+  '9781476753836', // Salt Fat Acid Heat
 ]);
 
 const SEED_BOOKS: {
@@ -143,42 +143,6 @@ const SEED_BOOKS: {
     price: 34.99,
     stock: 28,
     categories: ['javascript', 'programming'],
-  },
-  {
-    title: 'JavaScript: The Good Parts',
-    author: 'Douglas Crockford',
-    description: 'Unearthing the excellence in JavaScript.',
-    isbn: '9780596517748',
-    price: 27.99,
-    stock: 20,
-    categories: ['javascript'],
-  },
-  {
-    title: 'Head First Design Patterns',
-    author: 'Eric Freeman, Elisabeth Robson',
-    description: 'A brain-friendly guide to design patterns.',
-    isbn: '9780596007126',
-    price: 44.99,
-    stock: 16,
-    categories: ['design-patterns', 'programming'],
-  },
-  {
-    title: 'Effective Java',
-    author: 'Joshua Bloch',
-    description: 'Best practices for the Java platform.',
-    isbn: '9780134685991',
-    price: 46.99,
-    stock: 14,
-    categories: ['java', 'programming'],
-  },
-  {
-    title: 'The C Programming Language',
-    author: 'Brian W. Kernighan, Dennis M. Ritchie',
-    description: 'The definitive guide to C by its creators.',
-    isbn: '9780131103627',
-    price: 52.0,
-    stock: 10,
-    categories: ['c', 'programming'],
   },
   {
     title: 'Grokking Algorithms',
@@ -432,11 +396,76 @@ const SEED_BOOKS: {
     stock: 37,
     categories: ['fiction', 'sci-fi'],
   },
+  {
+    title: 'Norwegian Wood',
+    author: 'Haruki Murakami',
+    description: 'A quiet, aching story of love and memory in 1960s Tokyo.',
+    isbn: '9780375704024',
+    price: 13.99,
+    stock: 30,
+    categories: ['fiction'],
+  },
+  {
+    title: 'One Hundred Years of Solitude',
+    author: 'Gabriel García Márquez',
+    description: 'The Buendía family and the town of Macondo across seven generations.',
+    isbn: '9780060883287',
+    price: 12.99,
+    stock: 34,
+    categories: ['fiction', 'classics'],
+  },
+  {
+    title: 'The Name of the Rose',
+    author: 'Umberto Eco',
+    description: 'A medieval monastery, a string of deaths and a Franciscan detective.',
+    isbn: '9780156001311',
+    price: 14.99,
+    stock: 22,
+    categories: ['fiction', 'mystery'],
+  },
+  {
+    title: 'Salt Fat Acid Heat',
+    author: 'Samin Nosrat',
+    description: 'Mastering the elements of good cooking, with illustrations.',
+    isbn: '9781476753836',
+    price: 22.0,
+    stock: 26,
+    categories: ['cooking', 'nonfiction'],
+  },
 ];
 
 export type SeedOptions = {
   /** When true, seed only a handful of books (for automated tests). */
   minimalBooks?: boolean;
+};
+
+/** Series info and "look inside" samples (public-domain openings only). */
+const ENRICH: Record<string, { series?: string; seriesNumber?: number; sample?: string }> = {
+  '9780547928227': { series: 'Middle-earth', seriesNumber: 1 },
+  '9780547928210': { series: 'Middle-earth', seriesNumber: 2 },
+  '9780590353427': { series: 'Harry Potter', seriesNumber: 1 },
+  '9780439064873': { series: 'Harry Potter', seriesNumber: 2 },
+  '9780441172719': { series: 'Dune Chronicles', seriesNumber: 1 },
+  '9780141439518': {
+    sample:
+      'It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.\n\nHowever little known the feelings or views of such a man may be on his first entering a neighbourhood, this truth is so well fixed in the minds of the surrounding families, that he is considered the rightful property of some one or other of their daughters.\n\n"My dear Mr. Bennet," said his lady to him one day, "have you heard that Netherfield Park is let at last?"\n\nMr. Bennet replied that he had not.',
+  },
+  '9780141441146': {
+    sample:
+      'There was no possibility of taking a walk that day. We had been wandering, indeed, in the leafless shrubbery an hour in the morning; but since dinner (Mrs. Reed, when there was no company, dined early) the cold winter wind had brought with it clouds so sombre, and a rain so penetrating, that further out-door exercise was now out of the question.',
+  },
+  '9780141439471': {
+    sample:
+      'You will rejoice to hear that no disaster has accompanied the commencement of an enterprise which you have regarded with such evil forebodings. I arrived here yesterday, and my first task is to assure my dear sister of my welfare and increasing confidence in the success of my undertaking.',
+  },
+  '9780743273565': {
+    sample:
+      "In my younger and more vulnerable years my father gave me some advice that I've been turning over in my mind ever since.\n\n\"Whenever you feel like criticizing anyone,\" he told me, \"just remember that all the people in this world haven't had the advantages that you've had.\"",
+  },
+  '9780141439846': {
+    sample:
+      '3 May. Bistritz.—Left Munich at 8:35 P.M., on 1st May, arriving at Vienna early next morning; should have arrived at 6:46, but train was an hour late. Buda-Pesth seems a wonderful place, from the glimpse which I got of it from the train and the little I could walk through the streets.',
+  },
 };
 
 export async function runSeed(options: SeedOptions = {}): Promise<void> {
@@ -492,6 +521,7 @@ export async function runSeed(options: SeedOptions = {}): Promise<void> {
     const featured = FEATURED_ISBNS.has(b.isbn);
     await repos.books.upsertByIsbn(b.isbn, {
       ...b,
+      ...(ENRICH[b.isbn] ?? {}),
       price: Math.round(b.price * 100),
       coverImageUrl: coverUrl(b.isbn),
       currency: 'USD',

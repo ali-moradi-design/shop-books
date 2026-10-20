@@ -12,6 +12,7 @@ import {
 const router = Router();
 
 router.get('/featured', ctrl.listFeatured);
+router.get('/facets', ctrl.facets);
 router.get('/', validate({ query: listBooksQuerySchema }), ctrl.list);
 router.get('/:id', validate({ params: idParamSchema }), ctrl.getById);
 

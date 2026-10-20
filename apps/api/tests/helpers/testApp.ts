@@ -106,7 +106,7 @@ export async function setupTestApp(): Promise<TestContext> {
   await resetDatabase();
 
   const { runSeed } = await import('../../src/scripts/seed');
-  await runSeed({ minimalBooks: true });
+  await runSeed({ minimalBooks: false });
 
   const { default: app } = await import('../../src/app');
   const agent = request(app);

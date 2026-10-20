@@ -157,6 +157,27 @@ describe('Bookstore API (integration)', () => {
       expect(featured.body.data.every((b: { featured: boolean }) => b.featured === true)).toBe(true);
     });
 
+    it('searches by ISBN and series, filters by author, exposes facets and samples', async () => {
+      const byIsbn = await ctx.request.get('/api/v1/books?q=978-0-14-143951-8').expect(200);
+      expect(byIsbn.body.data.map((b: { title: string }) => b.title)).toContain('Pride and Prejudice');
+
+      const series = await ctx.request.get('/api/v1/books?series=Middle-earth&sort=title&order=asc').expect(200);
+      expect(series.body.data.length).toBe(2);
+      expect(series.body.data[0].seriesNumber).toBeDefined();
+
+      const byAuthor = await ctx.request.get('/api/v1/books?author=Jane%20Austen').expect(200);
+      expect(byAuthor.body.data.every((b: { author: string }) => b.author === 'Jane Austen')).toBe(true);
+
+      const facets = await ctx.request.get('/api/v1/books/facets').expect(200);
+      expect(facets.body.data.categories.length).toBeGreaterThan(3);
+      expect(facets.body.data.authors[0]).toHaveProperty('count');
+
+      const pride = byIsbn.body.data.find((b: { title: string }) => b.title === 'Pride and Prejudice');
+      expect(pride.sample).toBeUndefined();
+      const detail = await ctx.request.get(`/api/v1/books/${pride.id}`).expect(200);
+      expect(detail.body.data.sample).toMatch(/truth universally acknowledged/);
+    });
+
     it('admin can create and update a book', async () => {
       const created = await ctx.request
         .post('/api/v1/books')

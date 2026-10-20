@@ -20,6 +20,9 @@ export const createBookSchema = z.object({
   categories: z.array(z.string()).optional(),
   featured: z.boolean().optional(),
   featuredOrder: z.number().int().optional(),
+  series: z.string().min(1).max(200).optional(),
+  seriesNumber: z.number().int().positive().optional(),
+  sample: z.string().max(20000).optional(),
 });
 
 export const updateBookSchema = createBookSchema.partial();
@@ -29,6 +32,8 @@ export const idParamSchema = z.object({ id: z.string().min(1) });
 export const listBooksQuerySchema = z.object({
   q: z.string().optional(),
   category: z.string().optional(),
+  author: z.string().optional(),
+  series: z.string().optional(),
   // Minor units (cents)
   minPrice: z.coerce.number().int().nonnegative().optional(),
   maxPrice: z.coerce.number().int().nonnegative().optional(),

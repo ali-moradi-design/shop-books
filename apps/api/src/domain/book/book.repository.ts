@@ -14,6 +14,7 @@ export interface IBookRepository {
     isbn: string,
     data: CreateBookInput & { coverImageUrl: string },
   ): Promise<Book>;
+  facets(): Promise<{ categories: { name: string; count: number }[]; authors: { name: string; count: number }[] }>;
   count(): Promise<number>;
   countLowStock(threshold: number): Promise<number>;
   findLowStock(threshold: number, limit?: number): Promise<Book[]>;

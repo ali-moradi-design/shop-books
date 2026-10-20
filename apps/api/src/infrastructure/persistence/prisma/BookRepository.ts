@@ -54,6 +54,9 @@ export class PrismaBookRepository implements IBookRepository {
         categories: input.categories ?? [],
         featured: input.featured ?? false,
         featuredOrder: input.featuredOrder ?? 0,
+        series: input.series,
+        seriesNumber: input.seriesNumber,
+        sample: input.sample,
       },
     });
     return mapBook(row);
@@ -75,6 +78,9 @@ export class PrismaBookRepository implements IBookRepository {
           ...(input.categories !== undefined ? { categories: input.categories } : {}),
           ...(input.featured !== undefined ? { featured: input.featured } : {}),
           ...(input.featuredOrder !== undefined ? { featuredOrder: input.featuredOrder } : {}),
+          ...(input.series !== undefined ? { series: input.series } : {}),
+          ...(input.seriesNumber !== undefined ? { seriesNumber: input.seriesNumber } : {}),
+          ...(input.sample !== undefined ? { sample: input.sample } : {}),
         },
       });
       if (row.deletedAt) return null;
@@ -129,6 +135,9 @@ export class PrismaBookRepository implements IBookRepository {
         categories: data.categories ?? [],
         featured: data.featured ?? false,
         featuredOrder: data.featuredOrder ?? 0,
+        series: data.series,
+        seriesNumber: data.seriesNumber,
+        sample: data.sample,
       },
       update: {
         title: data.title,
@@ -141,10 +150,29 @@ export class PrismaBookRepository implements IBookRepository {
         categories: data.categories ?? [],
         featured: data.featured ?? false,
         featuredOrder: data.featuredOrder ?? 0,
+        series: data.series ?? null,
+        seriesNumber: data.seriesNumber ?? null,
+        sample: data.sample ?? null,
         deletedAt: null,
       },
     });
     return mapBook(row);
+  }
+
+  async facets() {
+    const rows = await getPrisma().book.findMany({
+      where: { deletedAt: null },
+      select: { categories: true, author: true },
+    });
+    const categories = new Map<string, number>();
+    const authors = new Map<string, number>();
+    for (const r of rows) {
+      for (const c of r.categories) categories.set(c, (categories.get(c) ?? 0) + 1);
+      authors.set(r.author, (authors.get(r.author) ?? 0) + 1);
+    }
+    const toList = (m: Map<string, number>) =>
+      [...m.entries()].map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+    return { categories: toList(categories), authors: toList(authors) };
   }
 
   async count(): Promise<number> {
@@ -173,7 +201,15 @@ function buildBookWhere(filter: BookListFilter): Prisma.BookWhereInput {
       { title: { contains: filter.q, mode: 'insensitive' } },
       { author: { contains: filter.q, mode: 'insensitive' } },
       { description: { contains: filter.q, mode: 'insensitive' } },
+      { series: { contains: filter.q, mode: 'insensitive' } },
+      { isbn: { contains: filter.q.replace(/[-\s]/g, '') } },
     ];
+  }
+  if (filter.author) {
+    where.author = { equals: filter.author, mode: 'insensitive' };
+  }
+  if (filter.series) {
+    where.series = { equals: filter.series, mode: 'insensitive' };
   }
   if (filter.category) {
     where.categories = { has: filter.category };

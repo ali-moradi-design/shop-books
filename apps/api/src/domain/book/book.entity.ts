@@ -11,6 +11,9 @@ export interface Book {
   categories?: string[];
   featured: boolean;
   featuredOrder?: number;
+  series?: string;
+  seriesNumber?: number;
+  sample?: string;
   deletedAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
@@ -28,6 +31,9 @@ export interface CreateBookInput {
   categories?: string[];
   featured?: boolean;
   featuredOrder?: number;
+  series?: string;
+  seriesNumber?: number;
+  sample?: string;
 }
 
 export type UpdateBookInput = Partial<CreateBookInput>;
@@ -35,6 +41,8 @@ export type UpdateBookInput = Partial<CreateBookInput>;
 export interface BookListFilter {
   q?: string;
   category?: string;
+  author?: string;
+  series?: string;
   minPrice?: number;
   maxPrice?: number;
   inStock?: boolean;

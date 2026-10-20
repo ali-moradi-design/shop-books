@@ -21,6 +21,10 @@ export class BookService {
     return this.books.listFeatured(limit);
   }
 
+  facets() {
+    return this.books.facets();
+  }
+
   async getById(id: string): Promise<Book> {
     const book = await this.books.findById(id);
     if (!book) throw new AppError('Book not found', 404);
