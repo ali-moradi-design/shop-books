@@ -2,11 +2,7 @@ import { Request, Response } from 'express';
 import { authService } from '../../../../infrastructure/composition';
 import { asyncHandler } from '../../../../shared/asyncHandler';
 import { AppError } from '../../../../shared/AppError';
-import {
-  setAuthCookies,
-  clearAuthCookies,
-  resolveRefreshToken,
-} from '../../cookies/authCookies';
+import { setAuthCookies, clearAuthCookies, resolveRefreshToken } from '../../cookies/authCookies';
 
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const result = await authService.register(req.body);

@@ -1,4 +1,7 @@
-import type { INotificationPort, NotificationMessage } from '../../domain/shared/notifications.port';
+import type {
+  INotificationPort,
+  NotificationMessage,
+} from '../../domain/shared/notifications.port';
 import { logger } from '../logging/logger';
 
 export class ConsoleNotifier implements INotificationPort {

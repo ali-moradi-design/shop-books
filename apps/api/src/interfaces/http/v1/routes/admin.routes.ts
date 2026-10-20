@@ -2,10 +2,7 @@ import { Router } from 'express';
 import { authenticate, requireAnyPermission } from '../../middleware/security/auth';
 import { validate } from '../../middleware/validate';
 import * as ctrl from '../controllers/admin.controller';
-import {
-  recentOrdersQuerySchema,
-  lowStockQuerySchema,
-} from '../validators/admin.validation';
+import { recentOrdersQuerySchema, lowStockQuerySchema } from '../validators/admin.validation';
 
 const router = Router();
 router.use(authenticate);
@@ -17,10 +14,6 @@ router.get(
   validate({ query: recentOrdersQuerySchema }),
   ctrl.recentOrders,
 );
-router.get(
-  '/dashboard/low-stock',
-  validate({ query: lowStockQuerySchema }),
-  ctrl.lowStock,
-);
+router.get('/dashboard/low-stock', validate({ query: lowStockQuerySchema }), ctrl.lowStock);
 
 export default router;

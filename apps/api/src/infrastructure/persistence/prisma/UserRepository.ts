@@ -30,10 +30,7 @@ export class PrismaUserRepository implements IUserRepository {
     return user;
   }
 
-  async findByEmail(
-    email: string,
-    opts?: { withPassword?: boolean },
-  ): Promise<User | null> {
+  async findByEmail(email: string, opts?: { withPassword?: boolean }): Promise<User | null> {
     const row = await getPrisma().user.findFirst({
       where: { email: email.toLowerCase(), deletedAt: null },
       include: { roles: true },

@@ -6,11 +6,7 @@ import type { Order } from '../../../domain/order/order.entity';
 import { DomainError } from '../../../domain/shared/DomainError';
 import { assertTransition } from '../../../domain/order/order.transitions';
 import { isStockLow, DEFAULT_LOW_STOCK_THRESHOLD } from '../../../domain/book/rules/stock';
-import {
-  domainEvents,
-  orderPaidEvent,
-  stockLowEvent,
-} from '../../../domain/shared/events';
+import { domainEvents, orderPaidEvent, stockLowEvent } from '../../../domain/shared/events';
 
 export class PayOrderUseCase {
   constructor(

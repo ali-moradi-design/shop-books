@@ -20,10 +20,7 @@ export class PrismaIssueReportRepository implements IIssueReportRepository {
     return row ? mapIssue(row) : null;
   }
 
-  async list(
-    filter: { reporterId?: string },
-    populate = false,
-  ): Promise<IssueReport[]> {
+  async list(filter: { reporterId?: string }, populate = false): Promise<IssueReport[]> {
     const rows = await getPrisma().issueReport.findMany({
       where: {
         deletedAt: null,

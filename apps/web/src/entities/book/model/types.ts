@@ -4,13 +4,17 @@ export interface Book {
   author: string;
   description: string;
   isbn?: string;
+  /** Minor units (cents). */
   price: number;
   currency: string;
   stock: number;
   coverImageUrl?: string;
   categories?: string[];
   featured: boolean;
-  featuredOrder?: number;
+  series?: string;
+  seriesNumber?: number;
+  /** First pages for "Look inside"; only on the single-book endpoint. */
+  sample?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -18,6 +22,8 @@ export interface Book {
 export interface BookListParams {
   q?: string;
   category?: string;
+  author?: string;
+  series?: string;
   page?: number;
   limit?: number;
   sort?: 'price' | 'title' | 'createdAt';
@@ -28,9 +34,8 @@ export interface BookListParams {
   maxPrice?: number;
 }
 
-/** Narrow public stock snapshot for dynamic holes. */
-export interface BookStockSnapshot {
-  id: string;
-  stock: number;
-  updatedAt: string;
+export interface Facets {
+  categories: { name: string; count: number }[];
+  authors: { name: string; count: number }[];
+  series: { name: string; count: number }[];
 }

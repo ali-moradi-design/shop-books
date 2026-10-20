@@ -10,8 +10,6 @@ import {
 } from '../validators/auth.validation';
 import { env } from '../../../../infrastructure/config/env';
 
-
-
 const router = Router();
 
 if (env.NODE_ENV !== 'test') {

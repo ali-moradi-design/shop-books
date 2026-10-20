@@ -1,5 +1,8 @@
 import type { IPermissionRepository } from '../../domain/rbac/rbac.repository';
-import type { CreatePermissionInput, UpdatePermissionInput } from '../../domain/rbac/permission.entity';
+import type {
+  CreatePermissionInput,
+  UpdatePermissionInput,
+} from '../../domain/rbac/permission.entity';
 import { AppError } from '../../shared/AppError';
 
 export class PermissionService {

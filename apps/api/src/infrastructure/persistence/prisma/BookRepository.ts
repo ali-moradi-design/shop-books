@@ -1,5 +1,10 @@
 import type { IBookRepository } from '../../../domain/book/book.repository';
-import type { Book, CreateBookInput, UpdateBookInput, BookListFilter } from '../../../domain/book/book.entity';
+import type {
+  Book,
+  CreateBookInput,
+  UpdateBookInput,
+  BookListFilter,
+} from '../../../domain/book/book.entity';
 import type { Prisma } from '@prisma/client';
 import { getPrisma } from './client';
 import { mapBook } from './mappers';
@@ -162,17 +167,21 @@ export class PrismaBookRepository implements IBookRepository {
   async facets() {
     const rows = await getPrisma().book.findMany({
       where: { deletedAt: null },
-      select: { categories: true, author: true },
+      select: { categories: true, author: true, series: true },
     });
     const categories = new Map<string, number>();
     const authors = new Map<string, number>();
+    const series = new Map<string, number>();
     for (const r of rows) {
       for (const c of r.categories) categories.set(c, (categories.get(c) ?? 0) + 1);
       authors.set(r.author, (authors.get(r.author) ?? 0) + 1);
+      if (r.series) series.set(r.series, (series.get(r.series) ?? 0) + 1);
     }
     const toList = (m: Map<string, number>) =>
-      [...m.entries()].map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
-    return { categories: toList(categories), authors: toList(authors) };
+      [...m.entries()]
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+    return { categories: toList(categories), authors: toList(authors), series: toList(series) };
   }
 
   async count(): Promise<number> {

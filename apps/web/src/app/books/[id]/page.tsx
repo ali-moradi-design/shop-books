@@ -1,59 +1,138 @@
+import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { cacheLife } from 'next/cache';
 import { fetchBook, fetchBooks } from '@/entities/book';
-import { BookDetail } from '@/widgets/book-detail';
-import { FreshStock } from '@/features/fresh-stock';
-import { Spinner } from '@/shared/ui/Spinner';
+import { BookInfo, BuyBox, LookInside, Related, Reviews } from '@/widgets/book-detail';
+import { firstParam } from '@/shared/lib/query';
+import { formatMoney } from '@/shared/lib/money';
 
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}): Promise<{ title: string; description?: string }> {
-  const { id } = await params;
-  try {
-    const book = await fetchBook(id);
-    return { title: `${book.title} · Niko Bookshop`, description: book.description.slice(0, 160) };
-  } catch {
-    return { title: 'Book · Niko Bookshop' };
-  }
-}
+type Params = Promise<{ id: string }>;
 
 export async function generateStaticParams() {
-  const { data: books } = await fetchBooks({ limit: 100 });
-  return books.map((b) => ({ id: b.id }));
+  const { data } = await fetchBooks({ limit: 100 });
+  return data.map((b) => ({ id: b.id }));
 }
 
-/** Cached static shell for book metadata (cover, title, price, description). */
-async function CachedBookMeta({ id }: { id: string }) {
-  'use cache';
-  cacheLife('hours');
+export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
+  const { id } = await params;
   try {
     const book = await fetchBook(id);
-    return <BookDetail book={book} stockSlot={null} />;
+    return {
+      title: book.title,
+      description: book.description.slice(0, 160),
+      alternates: { canonical: `/books/${id}` },
+      openGraph: {
+        title: `${book.title} by ${book.author}`,
+        description: book.description.slice(0, 160),
+        images: book.coverImageUrl ? [book.coverImageUrl] : undefined,
+      },
+    };
   } catch {
-    return null;
+    return { title: 'Book' };
   }
 }
 
-export default async function BookPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const meta = await CachedBookMeta({ id });
-  if (!meta) notFound();
+type SP = Promise<Record<string, string | string[] | undefined>>;
 
+/** Cached static shell: cover, text, "look inside" and JSON-LD. Dynamic parts arrive as slots. */
+async function Shell({
+  id,
+  buy,
+  reviews,
+}: {
+  id: string;
+  buy: React.ReactNode;
+  reviews: React.ReactNode;
+}) {
+  'use cache';
+  cacheLife('hours');
+  const book = await fetchBook(id).catch(() => null);
+  if (!book) return null;
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: book.title,
+      image: book.coverImageUrl,
+      description: book.description,
+      isbn: book.isbn,
+      brand: { '@type': 'Brand', name: book.author },
+      offers: {
+        '@type': 'Offer',
+        priceCurrency: book.currency,
+        price: (book.price / 100).toFixed(2),
+        availability:
+          book.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+        url: `/books/${book.id}`,
+      },
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Home', item: '/' },
+        { '@type': 'ListItem', position: 2, name: 'Books', item: '/books' },
+        { '@type': 'ListItem', position: 3, name: book.title },
+      ],
+    },
+  ];
   return (
-    <div className="space-y-6">
-      <Link href="/" className="text-sm text-indigo-700 hover:underline">
-        ← Catalog
-      </Link>
-      {meta}
-      {/* Dynamic PPR hole — outside use cache */}
-      <Suspense fallback={<Spinner label="Checking stock…" />}>
-        <FreshStock bookId={id} />
-      </Suspense>
-    </div>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
+      />
+      <p className="font-sans text-sm text-ink-muted">
+        <Link href="/">Home</Link> › <Link href="/books">Books</Link> ›{' '}
+        <span className="font-semibold text-forest-900">{book.title}</span>
+      </p>
+      <div className="mt-6 grid gap-12 lg:grid-cols-[420px_1fr_340px]">
+        <BookInfo book={book} />
+        {buy}
+      </div>
+      <LookInside book={book} />
+      {reviews}
+      <Related book={book} />
+    </>
+  );
+}
+
+async function BuyBoxSlot({ id, searchParams }: { id: string; searchParams: SP }) {
+  const error = firstParam((await searchParams).error);
+  return <BuyBox bookId={id} error={error} />;
+}
+
+export default async function BookPage({
+  params,
+  searchParams,
+}: {
+  params: Params;
+  searchParams: SP;
+}) {
+  const { id } = await params;
+  const book = await fetchBook(id).catch(() => null);
+  if (!book) notFound();
+  return (
+    <Shell
+      id={id}
+      buy={
+        <Suspense
+          fallback={
+            <aside className="rounded-[10px] border border-forest-200 bg-white p-7 font-sans text-4xl font-bold text-forest-900">
+              {formatMoney(book.price, book.currency)}
+            </aside>
+          }
+        >
+          <BuyBoxSlot id={id} searchParams={searchParams} />
+        </Suspense>
+      }
+      reviews={
+        <Suspense fallback={<p className="pt-16 font-serif text-lg">Loading reviews…</p>}>
+          <Reviews bookId={id} />
+        </Suspense>
+      }
+    />
   );
 }

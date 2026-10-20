@@ -1,5 +1,9 @@
 import { Router } from 'express';
-import { authenticate, requirePermission, requireAnyPermission } from '../../middleware/security/auth';
+import {
+  authenticate,
+  requirePermission,
+  requireAnyPermission,
+} from '../../middleware/security/auth';
 import { validate } from '../../middleware/validate';
 import * as ctrl from '../controllers/reviews.controller';
 import {
@@ -14,7 +18,13 @@ const router = Router();
 router.get('/', validate({ query: listReviewsQuerySchema }), ctrl.list);
 router.get('/:id', validate({ params: idParamSchema }), ctrl.getById);
 
-router.post('/', authenticate, requirePermission('reviews:create'), validate({ body: createReviewSchema }), ctrl.create);
+router.post(
+  '/',
+  authenticate,
+  requirePermission('reviews:create'),
+  validate({ body: createReviewSchema }),
+  ctrl.create,
+);
 router.patch(
   '/:id',
   authenticate,

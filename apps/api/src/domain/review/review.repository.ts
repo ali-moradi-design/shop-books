@@ -1,4 +1,9 @@
-import type { Review, CreateReviewInput, UpdateReviewInput, ReviewListFilter } from './review.entity';
+import type {
+  Review,
+  CreateReviewInput,
+  UpdateReviewInput,
+  ReviewListFilter,
+} from './review.entity';
 
 export interface IReviewRepository {
   findById(id: string, populate?: boolean): Promise<Review | null>;

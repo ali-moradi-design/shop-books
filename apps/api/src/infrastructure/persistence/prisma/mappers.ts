@@ -1,6 +1,13 @@
 import type { Book } from '../../../domain/book/book.entity';
 import type { User } from '../../../domain/user/user.entity';
-import type { Order, OrderItem, OrderStatus, Payment, ShippingAddress, StatusHistory } from '../../../domain/order/order.entity';
+import type {
+  Order,
+  OrderItem,
+  OrderStatus,
+  Payment,
+  ShippingAddress,
+  StatusHistory,
+} from '../../../domain/order/order.entity';
 import type { Review } from '../../../domain/review/review.entity';
 import type { Permission } from '../../../domain/rbac/permission.entity';
 import type { Role } from '../../../domain/rbac/role.entity';
@@ -49,10 +56,16 @@ export function mapBook(row: PrismaBook): Book {
 }
 
 type UserWithRoles = PrismaUser & {
-  roles?: { roleId: string; role?: PrismaRole & { permissions?: { permission: PrismaPermission }[] } }[];
+  roles?: {
+    roleId: string;
+    role?: PrismaRole & { permissions?: { permission: PrismaPermission }[] };
+  }[];
 };
 
-export function mapUser(row: UserWithRoles, opts?: { populateRoles?: boolean }): User & { rolesPopulated?: unknown } {
+export function mapUser(
+  row: UserWithRoles,
+  opts?: { populateRoles?: boolean },
+): User & { rolesPopulated?: unknown } {
   const roleIds = (row.roles ?? []).map((r) => r.roleId);
   const user: User & { rolesPopulated?: unknown } = {
     id: row.id,
@@ -132,7 +145,9 @@ export function mapOrder(row: OrderWithItems): Order {
     price: i.price,
     quantity: i.quantity,
   }));
-  const history = (Array.isArray(row.statusHistory) ? row.statusHistory : []) as unknown as StatusHistory[];
+  const history = (Array.isArray(row.statusHistory)
+    ? row.statusHistory
+    : []) as unknown as StatusHistory[];
   const payment: Payment = {
     method: 'fake',
     status: row.paymentStatus,

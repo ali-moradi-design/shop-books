@@ -1,24 +1,15 @@
 'use client';
 
-import { ErrorPanel } from '@/shared/ui/ErrorPanel';
+import { Button } from '@/shared/ui/Button';
 
-export default function Error({
-  error,
-  reset,
-}: {
-  error: Error & { digest?: string };
-  reset: () => void;
-}) {
+export default function Error({ reset }: { error: Error; reset: () => void }) {
   return (
-    <div className="space-y-4">
-      <ErrorPanel title="Failed to render" message={error.message} />
-      <button
-        type="button"
-        onClick={reset}
-        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500"
-      >
-        Try again
-      </button>
+    <div className="py-16 text-center" role="alert">
+      <h1 className="font-serif text-4xl text-forest-900">Something went wrong</h1>
+      <p className="my-4 font-serif text-lg">
+        The shop could not load this page. Please try again.
+      </p>
+      <Button onClick={reset}>Try again</Button>
     </div>
   );
 }

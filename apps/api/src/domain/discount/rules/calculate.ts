@@ -3,7 +3,11 @@ import { DomainError } from '../../shared/DomainError';
 import { Money } from '../../shared/Money';
 import { normalizeDiscountCode } from '../../shared/DiscountCode';
 
-export function assertDiscountApplicable(discount: Discount, subtotal: number, now = new Date()): void {
+export function assertDiscountApplicable(
+  discount: Discount,
+  subtotal: number,
+  now = new Date(),
+): void {
   if (!discount.isActive) {
     throw new DomainError('Discount code is inactive', 'INVALID_DISCOUNT');
   }
@@ -26,9 +30,7 @@ export function assertDiscountApplicable(discount: Discount, subtotal: number, n
 
 export function calculateDiscountAmount(discount: Discount, subtotal: number): number {
   const raw =
-    discount.type === 'percent'
-      ? Money.round((subtotal * discount.value) / 100)
-      : discount.value;
+    discount.type === 'percent' ? Money.round((subtotal * discount.value) / 100) : discount.value;
   return Math.max(0, Money.round(Math.min(raw, subtotal)));
 }
 

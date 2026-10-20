@@ -14,11 +14,10 @@ const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
 export function assertTransition(from: OrderStatus, to: OrderStatus): void {
   const allowed = ALLOWED_TRANSITIONS[from] ?? [];
   if (!allowed.includes(to)) {
-    throw new DomainError(
-      `Illegal status transition: ${from} → ${to}`,
-      'ILLEGAL_TRANSITION',
-      { from, to },
-    );
+    throw new DomainError(`Illegal status transition: ${from} → ${to}`, 'ILLEGAL_TRANSITION', {
+      from,
+      to,
+    });
   }
 }
 

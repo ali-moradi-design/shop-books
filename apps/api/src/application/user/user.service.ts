@@ -35,10 +35,7 @@ export class UserService {
     return users.map((u) => toPublic(u as typeof u & { rolesPopulated?: unknown }));
   }
 
-  async getById(
-    id: string,
-    requester: { id: string; permissions: string[] },
-  ): Promise<PublicUser> {
+  async getById(id: string, requester: { id: string; permissions: string[] }): Promise<PublicUser> {
     const isOwn = requester.id === id;
     const canReadAll = requester.permissions.includes('users:read');
     const canReadOwn = requester.permissions.includes('users:read-own');

@@ -41,7 +41,10 @@ export class Money {
 
   private assertSameCurrency(other: Money): void {
     if (this.currency !== other.currency) {
-      throw new DomainError(`Currency mismatch: ${this.currency} vs ${other.currency}`, 'VALIDATION');
+      throw new DomainError(
+        `Currency mismatch: ${this.currency} vs ${other.currency}`,
+        'VALIDATION',
+      );
     }
   }
 }

@@ -87,12 +87,8 @@ export class ReviewService {
     return {
       id: review.id,
       _id: review.id,
-      book: review.populated?.book
-        ? { _id: review.book, ...review.populated.book }
-        : review.book,
-      user: review.populated?.user
-        ? { _id: review.user, ...review.populated.user }
-        : review.user,
+      book: review.populated?.book ? { _id: review.book, ...review.populated.book } : review.book,
+      user: review.populated?.user ? { _id: review.user, ...review.populated.user } : review.user,
       rating: review.rating,
       comment: review.comment,
       createdAt: review.createdAt,

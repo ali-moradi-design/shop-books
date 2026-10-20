@@ -13,9 +13,7 @@ describe('cart totals', () => {
     const merged = mergeCartItem(items, 'a', 1);
     expect(merged[0].quantity).toBe(3);
 
-    const sub = computeSubtotal([
-      { bookId: 'a', title: 'A', price: 1050, quantity: 2 },
-    ]);
+    const sub = computeSubtotal([{ bookId: 'a', title: 'A', price: 1050, quantity: 2 }]);
     expect(sub).toBe(2100);
     expect(computeOrderTotal(2100, 500)).toBe(1600);
   });

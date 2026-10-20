@@ -2,7 +2,16 @@ import { connectDb } from '../infrastructure/config/db';
 import { repos } from '../infrastructure/composition';
 import { BcryptPasswordHasher } from '../infrastructure/security/password.service';
 
-const SECTIONS = ['books', 'users', 'roles', 'permissions', 'orders', 'reviews', 'reports', 'discounts'] as const;
+const SECTIONS = [
+  'books',
+  'users',
+  'roles',
+  'permissions',
+  'orders',
+  'reviews',
+  'reports',
+  'discounts',
+] as const;
 const CRUD = ['create', 'read', 'update', 'delete'] as const;
 
 function basePermissions() {
@@ -20,16 +29,66 @@ function basePermissions() {
   }
 
   const extras = [
-    { slug: 'orders:read-own', name: 'orders read own', description: 'Read own orders', section: 'orders' },
-    { slug: 'orders:update-status', name: 'orders update status', description: 'Update order status', section: 'orders' },
-    { slug: 'reviews:update-own', name: 'reviews update own', description: 'Update own reviews', section: 'reviews' },
-    { slug: 'reviews:delete-own', name: 'reviews delete own', description: 'Delete own reviews', section: 'reviews' },
-    { slug: 'users:read-own', name: 'users read own', description: 'Read own profile', section: 'users' },
-    { slug: 'users:update-own', name: 'users update own', description: 'Update own profile', section: 'users' },
-    { slug: 'reports:analytics', name: 'reports analytics', description: 'View analytics', section: 'reports' },
-    { slug: 'reports:manage', name: 'reports manage', description: 'Manage issue reports', section: 'reports' },
-    { slug: 'reports:issues:create', name: 'reports issues create', description: 'Create issue reports', section: 'reports' },
-    { slug: 'admin:dashboard', name: 'admin dashboard', description: 'Access admin dashboard endpoints', section: 'admin' },
+    {
+      slug: 'orders:read-own',
+      name: 'orders read own',
+      description: 'Read own orders',
+      section: 'orders',
+    },
+    {
+      slug: 'orders:update-status',
+      name: 'orders update status',
+      description: 'Update order status',
+      section: 'orders',
+    },
+    {
+      slug: 'reviews:update-own',
+      name: 'reviews update own',
+      description: 'Update own reviews',
+      section: 'reviews',
+    },
+    {
+      slug: 'reviews:delete-own',
+      name: 'reviews delete own',
+      description: 'Delete own reviews',
+      section: 'reviews',
+    },
+    {
+      slug: 'users:read-own',
+      name: 'users read own',
+      description: 'Read own profile',
+      section: 'users',
+    },
+    {
+      slug: 'users:update-own',
+      name: 'users update own',
+      description: 'Update own profile',
+      section: 'users',
+    },
+    {
+      slug: 'reports:analytics',
+      name: 'reports analytics',
+      description: 'View analytics',
+      section: 'reports',
+    },
+    {
+      slug: 'reports:manage',
+      name: 'reports manage',
+      description: 'Manage issue reports',
+      section: 'reports',
+    },
+    {
+      slug: 'reports:issues:create',
+      name: 'reports issues create',
+      description: 'Create issue reports',
+      section: 'reports',
+    },
+    {
+      slug: 'admin:dashboard',
+      name: 'admin dashboard',
+      description: 'Access admin dashboard endpoints',
+      section: 'admin',
+    },
   ];
 
   return [...perms, ...extras];
@@ -460,7 +519,7 @@ const ENRICH: Record<string, { series?: string; seriesNumber?: number; sample?: 
   },
   '9780743273565': {
     sample:
-      "In my younger and more vulnerable years my father gave me some advice that I've been turning over in my mind ever since.\n\n\"Whenever you feel like criticizing anyone,\" he told me, \"just remember that all the people in this world haven't had the advantages that you've had.\"",
+      'In my younger and more vulnerable years my father gave me some advice that I\'ve been turning over in my mind ever since.\n\n"Whenever you feel like criticizing anyone," he told me, "just remember that all the people in this world haven\'t had the advantages that you\'ve had."',
   },
   '9780141439846': {
     sample:
@@ -483,10 +542,8 @@ export async function runSeed(options: SeedOptions = {}): Promise<void> {
     permissions: allPerms.map((p) => p.id),
   });
 
-  const customerPermIds = allPerms
-    .filter((p) => CUSTOMER_SLUGS.includes(p.slug))
-    .map((p) => p.id);
-  await repos.roles.upsertByName('customer', {
+  const customerPermIds = allPerms.filter((p) => CUSTOMER_SLUGS.includes(p.slug)).map((p) => p.id);
+  const customerRole = await repos.roles.upsertByName('customer', {
     name: 'customer',
     description: 'Default customer role',
     permissions: customerPermIds,
@@ -507,6 +564,24 @@ export async function runSeed(options: SeedOptions = {}): Promise<void> {
       email: 'admin@bookstore.local',
       passwordHash,
       roles: [adminRole.id],
+      isActive: true,
+    });
+  }
+
+  const customerHash = await passwordHasher.hash('Customer123!');
+  const existingCustomer = await repos.users.findByEmail('customer@bookstore.local');
+  if (existingCustomer) {
+    await repos.users.update(existingCustomer.id, {
+      passwordHash: customerHash,
+      roles: [customerRole.id],
+      isActive: true,
+    });
+  } else {
+    await repos.users.create({
+      name: 'Demo Customer',
+      email: 'customer@bookstore.local',
+      passwordHash: customerHash,
+      roles: [customerRole.id],
       isActive: true,
     });
   }
@@ -563,6 +638,7 @@ async function main() {
   const bookCount = await repos.books.count();
   console.log(`Books upserted (catalog count: ${bookCount}); featured: ${FEATURED_ISBNS.size}`);
   console.log('Admin user: admin@bookstore.local / Admin123!');
+  console.log('Demo customer: customer@bookstore.local / Customer123!');
   console.log('Sample discounts: WELCOME10 (10%), FLAT5 ($5 off)');
   console.log('Seed complete.');
   process.exit(0);

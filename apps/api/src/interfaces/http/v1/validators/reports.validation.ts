@@ -18,7 +18,15 @@ export const updateIssueSchema = z.object({
 export const idParamSchema = z.object({ id: z.string().min(1) });
 
 export const dateRangeQuerySchema = z.object({
-  from: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}/)).optional(),
-  to: z.string().datetime().or(z.string().regex(/^\d{4}-\d{2}-\d{2}/)).optional(),
+  from: z
+    .string()
+    .datetime()
+    .or(z.string().regex(/^\d{4}-\d{2}-\d{2}/))
+    .optional(),
+  to: z
+    .string()
+    .datetime()
+    .or(z.string().regex(/^\d{4}-\d{2}-\d{2}/))
+    .optional(),
   limit: z.coerce.number().int().positive().max(50).optional(),
 });

@@ -12,7 +12,12 @@ const router = Router();
 router.use(authenticate);
 
 router.get('/', requirePermission('discounts:read'), ctrl.list);
-router.get('/:id', requirePermission('discounts:read'), validate({ params: idParamSchema }), ctrl.getById);
+router.get(
+  '/:id',
+  requirePermission('discounts:read'),
+  validate({ params: idParamSchema }),
+  ctrl.getById,
+);
 router.post(
   '/',
   requirePermission('discounts:create'),

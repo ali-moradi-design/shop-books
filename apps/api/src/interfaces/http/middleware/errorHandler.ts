@@ -10,12 +10,7 @@ export function notFoundHandler(_req: Request, res: Response): void {
   res.status(404).json({ message: 'Route not found' });
 }
 
-export function errorHandler(
-  err: unknown,
-  req: Request,
-  res: Response,
-  _next: NextFunction,
-): void {
+export function errorHandler(err: unknown, req: Request, res: Response, _next: NextFunction): void {
   const requestId = req.requestId;
 
   if (err instanceof ZodError) {

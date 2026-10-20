@@ -154,25 +154,38 @@ describe('Bookstore API (integration)', () => {
 
       const featured = await ctx.request.get('/api/v1/books/featured').expect(200);
       expect(featured.body.data.length).toBeGreaterThan(0);
-      expect(featured.body.data.every((b: { featured: boolean }) => b.featured === true)).toBe(true);
+      expect(featured.body.data.every((b: { featured: boolean }) => b.featured === true)).toBe(
+        true,
+      );
     });
 
     it('searches by ISBN and series, filters by author, exposes facets and samples', async () => {
       const byIsbn = await ctx.request.get('/api/v1/books?q=978-0-14-143951-8').expect(200);
-      expect(byIsbn.body.data.map((b: { title: string }) => b.title)).toContain('Pride and Prejudice');
+      expect(byIsbn.body.data.map((b: { title: string }) => b.title)).toContain(
+        'Pride and Prejudice',
+      );
 
-      const series = await ctx.request.get('/api/v1/books?series=Middle-earth&sort=title&order=asc').expect(200);
+      const series = await ctx.request
+        .get('/api/v1/books?series=Middle-earth&sort=title&order=asc')
+        .expect(200);
       expect(series.body.data.length).toBe(2);
       expect(series.body.data[0].seriesNumber).toBeDefined();
 
       const byAuthor = await ctx.request.get('/api/v1/books?author=Jane%20Austen').expect(200);
-      expect(byAuthor.body.data.every((b: { author: string }) => b.author === 'Jane Austen')).toBe(true);
+      expect(byAuthor.body.data.every((b: { author: string }) => b.author === 'Jane Austen')).toBe(
+        true,
+      );
 
       const facets = await ctx.request.get('/api/v1/books/facets').expect(200);
       expect(facets.body.data.categories.length).toBeGreaterThan(3);
       expect(facets.body.data.authors[0]).toHaveProperty('count');
+      expect(facets.body.data.series.map((s: { name: string }) => s.name)).toContain(
+        'Middle-earth',
+      );
 
-      const pride = byIsbn.body.data.find((b: { title: string }) => b.title === 'Pride and Prejudice');
+      const pride = byIsbn.body.data.find(
+        (b: { title: string }) => b.title === 'Pride and Prejudice',
+      );
       expect(pride.sample).toBeUndefined();
       const detail = await ctx.request.get(`/api/v1/books/${pride.id}`).expect(200);
       expect(detail.body.data.sample).toMatch(/truth universally acknowledged/);
@@ -283,8 +296,14 @@ describe('Bookstore API (integration)', () => {
           .expect(201);
       }
 
-      const orders1 = await ctx.request.get('/api/v1/orders').set(authHeader(c1.accessToken)).expect(200);
-      const orders2 = await ctx.request.get('/api/v1/orders').set(authHeader(c2.accessToken)).expect(200);
+      const orders1 = await ctx.request
+        .get('/api/v1/orders')
+        .set(authHeader(c1.accessToken))
+        .expect(200);
+      const orders2 = await ctx.request
+        .get('/api/v1/orders')
+        .set(authHeader(c2.accessToken))
+        .expect(200);
       const order1Id = orders1.body.data[0].id as string;
       const order2Id = orders2.body.data[0].id as string;
 
@@ -346,8 +365,9 @@ describe('Bookstore API (integration)', () => {
       const customer = await registerCustomer(ctx.request, `disc_${Date.now()}`);
       const books = await ctx.request.get('/api/v1/books?limit=20').expect(200);
       const book =
-        books.body.data.find((b: { price: number; stock: number }) => b.price >= 2000 && b.stock > 0) ??
-        books.body.data[0];
+        books.body.data.find(
+          (b: { price: number; stock: number }) => b.price >= 2000 && b.stock > 0,
+        ) ?? books.body.data[0];
       const qty = book.price >= 2000 ? 1 : 2;
 
       await ctx.request

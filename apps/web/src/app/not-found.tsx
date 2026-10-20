@@ -1,12 +1,11 @@
-import Link from 'next/link';
+import { ButtonLink } from '@/shared/ui/Button';
 
 export default function NotFound() {
   return (
-    <div className="space-y-3 text-center">
-      <h1 className="text-2xl font-bold">Book not found</h1>
-      <Link href="/" className="text-indigo-700 hover:underline">
-        Back to catalog
-      </Link>
+    <div className="py-16 text-center">
+      <h1 className="font-serif text-5xl text-forest-900">Page not found</h1>
+      <p className="my-4 font-serif text-lg">We could not find that page or book.</p>
+      <ButtonLink href="/books">Browse books</ButtonLink>
     </div>
   );
 }

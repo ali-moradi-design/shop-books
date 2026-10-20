@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /*
  * Design tokens for the Books shop (see docs/mockups).
@@ -15,7 +15,7 @@
 
   --color-mint-100: #e3f2ec;
   --color-mint-300: #9bd0c0;
-  --color-mint-500: #3f8a73;
+  --color-mint-500: #2f6f5b;
 
   --color-cream: #f5f1e8;
   --color-paper: #ffffff;
@@ -31,7 +31,7 @@
   --color-star: #c98a1b;
   --color-ok: #1b6b4f;
 
-  --font-serif: var(--font-source-serif), "Georgia", serif;
+  --font-serif: var(--font-source-serif), 'Georgia', serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
 
   --shadow-book: 0 24px 24px -12px rgb(38 38 38 / 0.2);
@@ -46,12 +46,16 @@
   color-scheme: light;
 }
 
-body {
-  @apply min-h-screen bg-cream font-serif text-ink antialiased;
-}
+/* Base rules live in a layer so utilities (text-white, ...) can override them. */
+@layer base {
+  body {
+    @apply min-h-screen overflow-x-clip bg-cream font-serif text-ink antialiased;
+  }
 
-a {
-  @apply text-inherit no-underline;
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
 }
 
 /* Book cover: spine-hinge overlay (multiply) + soft shadow, as on goodbooks.io/books */
@@ -60,11 +64,20 @@ a {
     @apply relative block w-full shadow-book transition-shadow duration-200 hover:shadow-book-hover;
   }
   .book-cover::after {
-    content: "";
+    content: '';
     @apply pointer-events-none absolute inset-0 mix-blend-multiply;
     border-radius: var(--radius-book);
     background:
-      linear-gradient(90deg, rgb(0 0 0 / 0) 0, rgb(0 0 0 / 0.22) 1.6%, rgb(255 255 255 / 0.9) 3.2%, rgb(0 0 0 / 0.14) 4.6%, rgb(255 255 255 / 0.96) 7%, #fff 92%, rgb(0 0 0 / 0.12) 100%),
+      linear-gradient(
+        90deg,
+        rgb(0 0 0 / 0) 0,
+        rgb(0 0 0 / 0.22) 1.6%,
+        rgb(255 255 255 / 0.9) 3.2%,
+        rgb(0 0 0 / 0.14) 4.6%,
+        rgb(255 255 255 / 0.96) 7%,
+        #fff 92%,
+        rgb(0 0 0 / 0.12) 100%
+      ),
       linear-gradient(180deg, rgb(0 0 0 / 0.1) 0, #fff 3%, #fff 97%, rgb(0 0 0 / 0.14) 100%);
   }
   .book-cover > img {

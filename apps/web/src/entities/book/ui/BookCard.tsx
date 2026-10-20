@@ -1,34 +1,35 @@
 import Link from 'next/link';
 import type { Book } from '../model/types';
-import { formatPrice } from '@/shared/lib/format';
-import { FeaturedBadge } from './FeaturedBadge';
+import { BookCover } from './BookCover';
+import { Stars } from '@/shared/ui/Stars';
+import { formatMoney } from '@/shared/lib/money';
 
-export function BookCard({ book }: { book: Book }) {
+export function BookCard({
+  book,
+  rating,
+  footer,
+}: {
+  book: Book;
+  rating?: number;
+  footer?: React.ReactNode;
+}) {
   return (
-    <Link
-      href={`/books/${book.id}`}
-      className="group flex flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-    >
-      <div className="aspect-[3/4] bg-slate-100">
-        {book.coverImageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={book.coverImageUrl} alt={book.title} className="h-full w-full object-cover" />
-        ) : (
-          <div className="flex h-full items-center justify-center text-slate-400">No cover</div>
+    <article className="group flex flex-col">
+      <Link href={`/books/${book.id}`} aria-label={`${book.title} by ${book.author}`}>
+        <BookCover book={book} />
+        <h3 className="mt-4 font-serif text-lg font-semibold leading-snug group-hover:underline">
+          {book.title}
+        </h3>
+      </Link>
+      <p className="font-serif text-[15px] text-ink-muted">{book.author}</p>
+      {rating !== undefined && <Stars value={rating} className="mt-1" />}
+      <p className="mt-1 flex items-center gap-2 font-sans">
+        <span className="font-bold text-forest-900">{formatMoney(book.price, book.currency)}</span>
+        {book.stock === 0 && (
+          <span className="rounded-full bg-gold-300/60 px-2 py-0.5 text-xs">Sold out</span>
         )}
-      </div>
-      <div className="flex flex-1 flex-col gap-1 p-3">
-        <div className="flex items-start justify-between gap-2">
-          <h2 className="line-clamp-2 text-sm font-semibold text-slate-900 group-hover:text-indigo-700">
-            {book.title}
-          </h2>
-          {book.featured ? <FeaturedBadge /> : null}
-        </div>
-        <p className="text-xs text-slate-500">{book.author}</p>
-        <p className="mt-auto pt-2 text-sm font-medium text-indigo-700">
-          {formatPrice(book.price, book.currency)}
-        </p>
-      </div>
-    </Link>
+      </p>
+      {footer}
+    </article>
   );
 }

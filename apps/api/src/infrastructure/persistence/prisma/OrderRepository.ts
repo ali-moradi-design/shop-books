@@ -132,7 +132,9 @@ export class PrismaOrderRepository implements IOrderRepository {
     });
     if (!existing) return null;
 
-    const history = (Array.isArray(existing.statusHistory) ? existing.statusHistory : []) as unknown as StatusHistory[];
+    const history = (Array.isArray(existing.statusHistory)
+      ? existing.statusHistory
+      : []) as unknown as StatusHistory[];
     history.push({ status, at: new Date(), note });
 
     const row = await getPrisma().order.update({
@@ -185,7 +187,10 @@ export class PrismaOrderRepository implements IOrderRepository {
       where,
       select: { items: true },
     });
-    const map = new Map<string, { _id: string; title: string; quantitySold: number; revenue: number }>();
+    const map = new Map<
+      string,
+      { _id: string; title: string; quantitySold: number; revenue: number }
+    >();
     for (const order of orders) {
       for (const item of order.items) {
         const cur = map.get(item.bookId) ?? {
@@ -199,9 +204,7 @@ export class PrismaOrderRepository implements IOrderRepository {
         map.set(item.bookId, cur);
       }
     }
-    return [...map.values()]
-      .sort((a, b) => b.quantitySold - a.quantitySold)
-      .slice(0, limit);
+    return [...map.values()].sort((a, b) => b.quantitySold - a.quantitySold).slice(0, limit);
   }
 
   async aggregateSalesByDate(match: Record<string, unknown>) {

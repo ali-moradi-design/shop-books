@@ -1,5 +1,9 @@
 import { Router } from 'express';
-import { authenticate, requirePermission, requireAnyPermission } from '../../middleware/security/auth';
+import {
+  authenticate,
+  requirePermission,
+  requireAnyPermission,
+} from '../../middleware/security/auth';
 import { validate } from '../../middleware/validate';
 import * as ctrl from '../controllers/reports.controller';
 import {

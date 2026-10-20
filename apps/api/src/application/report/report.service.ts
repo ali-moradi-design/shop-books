@@ -18,10 +18,7 @@ export class ReportService {
   }
 
   async listIssues(userId: string, canManage: boolean) {
-    const list = await this.issues.list(
-      canManage ? {} : { reporterId: userId },
-      true,
-    );
+    const list = await this.issues.list(canManage ? {} : { reporterId: userId }, true);
     return list.map((i) => this.toResponse(i));
   }
 
@@ -34,12 +31,7 @@ export class ReportService {
     return this.toResponse(issue);
   }
 
-  async updateIssue(
-    id: string,
-    body: UpdateIssueInput,
-    userId: string,
-    canManage: boolean,
-  ) {
+  async updateIssue(id: string, body: UpdateIssueInput, userId: string, canManage: boolean) {
     const issue = await this.issues.findById(id);
     if (!issue) throw new AppError('Issue not found', 404);
 

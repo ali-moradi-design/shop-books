@@ -34,8 +34,8 @@ describe('discount rules', () => {
 
   it('rejects inactive / below minimum', () => {
     expect(() => assertDiscountApplicable(base({ isActive: false }), 50)).toThrow(DomainError);
-    expect(() =>
-      assertDiscountApplicable(base({ minOrderAmount: 8000 }), 5000),
-    ).toThrow(/at least/);
+    expect(() => assertDiscountApplicable(base({ minOrderAmount: 8000 }), 5000)).toThrow(
+      /at least/,
+    );
   });
 });

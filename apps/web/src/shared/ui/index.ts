@@ -1,4 +1,3 @@
-export { Spinner } from './Spinner';
-export { EmptyState } from './EmptyState';
-export { ErrorPanel } from './ErrorPanel';
-export { CatalogSkeleton } from './CatalogSkeleton';
+export * from './Button';
+export * from './Notice';
+export * from './Stars';

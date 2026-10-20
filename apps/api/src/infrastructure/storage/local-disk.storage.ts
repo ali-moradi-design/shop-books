@@ -18,7 +18,12 @@ export class LocalDiskStorage implements IStoragePort {
     return `/uploads/${folder}/${filename}`;
   }
 
-  async save(folder: string, filename: string, buffer: Buffer, mimetype: string): Promise<StoredFile> {
+  async save(
+    folder: string,
+    filename: string,
+    buffer: Buffer,
+    mimetype: string,
+  ): Promise<StoredFile> {
     const dir = this.absoluteDir(folder);
     const full = path.join(dir, filename);
     await fs.promises.writeFile(full, buffer);

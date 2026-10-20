@@ -1,10 +1,6 @@
 import type { IOrderRepository } from '../../domain/order/order.repository';
 import type { IBookRepository } from '../../domain/book/book.repository';
-import type {
-  Order,
-  OrderStatus,
-  ShippingAddress,
-} from '../../domain/order/order.entity';
+import type { Order, OrderStatus, ShippingAddress } from '../../domain/order/order.entity';
 import type { DiscountService } from '../discount/discount.service';
 import type { IUnitOfWork } from '../shared/unit-of-work.port';
 import type { INotificationPort } from '../../domain/shared/notifications.port';

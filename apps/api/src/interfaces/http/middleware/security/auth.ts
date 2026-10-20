@@ -14,14 +14,16 @@ function resolveAccessToken(req: Request): string | undefined {
   return readCookie(req, ACCESS_TOKEN_COOKIE);
 }
 
-export const authenticate = asyncHandler(async (req: Request, _res: Response, next: NextFunction) => {
-  const token = resolveAccessToken(req);
-  if (!token) {
-    throw new AppError('Authentication required', 401);
-  }
-  req.user = await authContextService.fromAccessToken(token);
-  next();
-});
+export const authenticate = asyncHandler(
+  async (req: Request, _res: Response, next: NextFunction) => {
+    const token = resolveAccessToken(req);
+    if (!token) {
+      throw new AppError('Authentication required', 401);
+    }
+    req.user = await authContextService.fromAccessToken(token);
+    next();
+  },
+);
 
 export function requirePermission(...required: string[]) {
   return (req: Request, _res: Response, next: NextFunction): void => {

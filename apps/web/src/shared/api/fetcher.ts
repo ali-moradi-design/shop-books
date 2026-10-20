@@ -1,17 +1,25 @@
 import { API_V1 } from '@/shared/config';
 import { ApiError } from './types';
 
-export type FetchInit = RequestInit & {
+export type FetchInit = Omit<RequestInit, 'body'> & {
   next?: { revalidate?: number | false; tags?: string[] };
+  /** JSON request body. */
+  json?: unknown;
+  /** Bearer access token for authenticated endpoints. */
+  token?: string;
 };
 
-export async function apiGetJson<T>(path: string, init?: FetchInit): Promise<T> {
+export async function apiRequest<T>(path: string, init: FetchInit = {}): Promise<T> {
+  const { json, token, headers, ...rest } = init;
   const url = `${API_V1}${path.startsWith('/') ? path : `/${path}`}`;
   const res = await fetch(url, {
-    ...init,
+    ...rest,
+    ...(json !== undefined ? { body: JSON.stringify(json) } : {}),
     headers: {
       Accept: 'application/json',
-      ...(init?.headers ?? {}),
+      ...(json !== undefined ? { 'Content-Type': 'application/json' } : {}),
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(headers ?? {}),
     },
   });
   if (!res.ok) {
@@ -19,15 +27,15 @@ export async function apiGetJson<T>(path: string, init?: FetchInit): Promise<T> 
     try {
       body = await res.json();
     } catch {
-      body = await res.text();
+      body = undefined;
     }
-    const detail =
-      typeof body === 'object' && body && 'message' in body
+    const message =
+      body && typeof body === 'object' && 'message' in body
         ? String((body as { message: unknown }).message)
-        : typeof body === 'string'
-          ? body
-          : undefined;
-    throw new ApiError(detail || `API ${res.status} for ${path}`, res.status, body);
+        : `API ${res.status} for ${path}`;
+    throw new ApiError(message, res.status, body);
   }
   return res.json() as Promise<T>;
 }
+
+export const apiGetJson = <T>(path: string, init?: FetchInit) => apiRequest<T>(path, init);

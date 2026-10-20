@@ -8,11 +8,7 @@ export function assertPositiveQuantity(quantity: number): void {
   }
 }
 
-export function assertSufficientStock(
-  available: number,
-  requested: number,
-  title?: string,
-): void {
+export function assertSufficientStock(available: number, requested: number, title?: string): void {
   if (available < requested) {
     const label = title ? `"${title}"` : 'book';
     throw new DomainError(

@@ -10,11 +10,12 @@ export interface IBookRepository {
   softDelete(id: string): Promise<Book | null>;
   decrementStock(bookId: string, quantity: number): Promise<boolean>;
   incrementStock(bookId: string, quantity: number): Promise<void>;
-  upsertByIsbn(
-    isbn: string,
-    data: CreateBookInput & { coverImageUrl: string },
-  ): Promise<Book>;
-  facets(): Promise<{ categories: { name: string; count: number }[]; authors: { name: string; count: number }[] }>;
+  upsertByIsbn(isbn: string, data: CreateBookInput & { coverImageUrl: string }): Promise<Book>;
+  facets(): Promise<{
+    categories: { name: string; count: number }[];
+    authors: { name: string; count: number }[];
+    series: { name: string; count: number }[];
+  }>;
   count(): Promise<number>;
   countLowStock(threshold: number): Promise<number>;
   findLowStock(threshold: number, limit?: number): Promise<Book[]>;

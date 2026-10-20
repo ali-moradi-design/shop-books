@@ -10,6 +10,7 @@
     "lint": "eslint \"src/**/*.{ts,js}\" \"tests/**/*.{ts,js}\"",
     "format": "prettier --write \"src/**/*.{ts,js,json}\" \"*.md\"",
     "dev:db": "tsx src/scripts/dev-db.ts",
+    "e2e:serve": "tsx src/scripts/e2e-server.ts",
     "seed": "tsx src/scripts/seed.ts",
     "test": "vitest run",
     "test:watch": "vitest",

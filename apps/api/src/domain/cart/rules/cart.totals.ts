@@ -26,7 +26,11 @@ export function mergeCartItem(items: CartItem[], bookId: string, quantity: numbe
   return next;
 }
 
-export function setCartItemQuantity(items: CartItem[], bookId: string, quantity: number): CartItem[] {
+export function setCartItemQuantity(
+  items: CartItem[],
+  bookId: string,
+  quantity: number,
+): CartItem[] {
   const next = items.map((i) => ({ ...i }));
   const item = next.find((i) => i.bookId === bookId);
   if (!item) {
@@ -52,6 +56,10 @@ export function computeSubtotal(lines: PricedLine[], currency = 'USD'): number {
   return total.minor;
 }
 
-export function computeOrderTotal(subtotal: number, discountAmount: number, currency = 'USD'): number {
+export function computeOrderTotal(
+  subtotal: number,
+  discountAmount: number,
+  currency = 'USD',
+): number {
   return Money.of(subtotal, currency).subtract(Money.of(discountAmount, currency)).minor;
 }
