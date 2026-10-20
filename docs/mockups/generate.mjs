@@ -39,7 +39,7 @@ footer{margin-top:80px;background:var(--g);color:#cfe6dd;padding:44px 96px;displ
 `;
 const header = (on) => `<div class=top><div class=logo>Bay Book Company</div><div class=sf><span>Keyword ⌄</span><em>Search by title, author, genre, or ISBN</em><b>Search</b></div><a>♡ Reading list</a><a>Login</a><a>Cart (2)</a></div>
 <div class=menu>${['Home', 'Browse ⌄', 'Series', 'Staff Picks', 'Events', 'Gift Cards', 'About'].map((m) => `<span class="${m === on ? 'on' : ''}">${m}</span>`).join('')}</div>`;
-const foot = `<footer><span>© Bay Book Company — demo shop, fake payments</span><span>EN · DE · ES · فارسی · العربية</span></footer>`;
+const foot = `<footer><span>© Bay Book Company — demo shop, fake payments</span><span>Free shipping over $40</span></footer>`;
 const page = (t, extra, body) => `<!doctype html><meta charset=utf-8><title>${t}</title><style>${css}${extra}</style><body>${body}</body>`;
 
 // 1 HOME

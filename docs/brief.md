@@ -23,11 +23,7 @@ with separate code, repos and databases.
   (products, orders, stock), demo accounts, nightly demo-data reset.
 - Payments: one payment interface with the fake gateway as the only implementation.
 - SEO: metadata, JSON-LD (Product, BreadcrumbList), sitemap, OG images.
-- Languages: English, German, Spanish, Persian, Arabic (Persian and Arabic RTL;
-  logical CSS; native digits by default with a Latin-digit setting; Gregorian
-  calendar; Vazirmatn for Persian/Arabic; German text ~30% longer). The UI is in
-  all five languages; product content (names, descriptions, categories) is in
-  English, Spanish and Arabic, with English as the fallback for German and Persian.
+- Language: English only (no i18n, no RTL).
 - Money in minor units with a currency code; formatting with `Intl`.
 - UI: its own, clearly different look. Mockups first as images (HTML/CSS rendered
   to PNG with Playwright); no UI code before the user approves.
@@ -47,4 +43,4 @@ with separate code, repos and databases.
 ## Decided
 
 - Repo `shop-books` (public); subdomain `shop-books.ali-moradi-develop.com`.
-- Product content in English, Spanish and Arabic.
+- English only: UI and product content.

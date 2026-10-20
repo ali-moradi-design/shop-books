@@ -9,18 +9,18 @@ export function SiteHeader({
   trailing?: ReactNode;
 }) {
   return (
-    <header className="border-b border-slate-200 bg-white/80 backdrop-blur">
+    <header className="bg-forest-900 text-white">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-4">
         <div className="flex items-center gap-3">
-          <Link href="/" className="text-lg font-bold text-slate-900">
+          <Link href="/" className="font-serif text-2xl font-medium">
             Niko Bookshop
           </Link>
-          <span className="rounded-md bg-indigo-50 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-indigo-700">
+          <span className="rounded-md bg-mint-300 px-2 py-0.5 font-sans text-xs font-semibold uppercase tracking-wide text-forest-900">
             {modeLabel}
           </span>
         </div>
-        <nav aria-label="Primary" className="flex items-center gap-4 text-sm text-slate-600">
-          <Link href="/" className="hover:text-indigo-700">
+        <nav aria-label="Primary" className="flex items-center gap-4 font-sans text-sm text-mint-100">
+          <Link href="/" className="hover:text-white">
             Catalog
           </Link>
           {trailing}

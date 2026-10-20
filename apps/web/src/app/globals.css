@@ -1,13 +1,74 @@
 @import "tailwindcss";
 
+/*
+ * Design tokens for the Books shop (see docs/mockups).
+ * Tailwind v4 turns every --color-*, --font-*, --shadow-* below into utilities:
+ * bg-forest, text-ink, font-serif, shadow-book, ...
+ */
+@theme {
+  --color-forest-50: #eef6f2;
+  --color-forest-100: #e1ede8;
+  --color-forest-200: #cfe0d8;
+  --color-forest-500: #2c6a57;
+  --color-forest-700: #1f5546;
+  --color-forest-900: #174236;
+
+  --color-mint-100: #e3f2ec;
+  --color-mint-300: #9bd0c0;
+  --color-mint-500: #3f8a73;
+
+  --color-cream: #f5f1e8;
+  --color-paper: #ffffff;
+  --color-ink: #1c2b24;
+  --color-ink-muted: #555555;
+
+  --color-wood-500: #8a5a2b;
+  --color-wood-900: #4b2e14;
+
+  --color-gold-300: #ffc94d;
+  --color-gold-500: #d9a85b;
+  --color-sale: #e4322b;
+  --color-star: #c98a1b;
+  --color-ok: #1b6b4f;
+
+  --font-serif: var(--font-source-serif), "Georgia", serif;
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-book: 0 24px 24px -12px rgb(38 38 38 / 0.2);
+  --shadow-book-hover: 0 32px 40px -12px rgb(38 38 38 / 0.15);
+
+  --radius-book: 1px 3px 3px 1px;
+
+  --container-shop: 1248px;
+}
+
 :root {
   color-scheme: light;
 }
 
 body {
-  @apply min-h-screen bg-slate-50 text-slate-900 antialiased;
+  @apply min-h-screen bg-cream font-serif text-ink antialiased;
 }
 
 a {
   @apply text-inherit no-underline;
+}
+
+/* Book cover: spine-hinge overlay (multiply) + soft shadow, as on goodbooks.io/books */
+@layer components {
+  .book-cover {
+    @apply relative block w-full shadow-book transition-shadow duration-200 hover:shadow-book-hover;
+  }
+  .book-cover::after {
+    content: "";
+    @apply pointer-events-none absolute inset-0 mix-blend-multiply;
+    border-radius: var(--radius-book);
+    background:
+      linear-gradient(90deg, rgb(0 0 0 / 0) 0, rgb(0 0 0 / 0.22) 1.6%, rgb(255 255 255 / 0.9) 3.2%, rgb(0 0 0 / 0.14) 4.6%, rgb(255 255 255 / 0.96) 7%, #fff 92%, rgb(0 0 0 / 0.12) 100%),
+      linear-gradient(180deg, rgb(0 0 0 / 0.1) 0, #fff 3%, #fff 97%, rgb(0 0 0 / 0.14) 100%);
+  }
+  .book-cover > img {
+    @apply block aspect-[2/3] w-full object-cover;
+    border-radius: var(--radius-book);
+  }
 }
