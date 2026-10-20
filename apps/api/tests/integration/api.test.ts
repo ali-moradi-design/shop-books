@@ -451,4 +451,28 @@ describe('Bookstore API (integration)', () => {
         .expect(403);
     });
   });
+
+  describe('Demo reset', () => {
+    it('removes visitor data, keeps demo accounts and book ids, restores stock', async () => {
+      const visitor = await registerCustomer(ctx.request, `reset_${Date.now()}`);
+      const books = await ctx.request.get('/api/v1/books?limit=1').expect(200);
+      const book = books.body.data[0] as { id: string; stock: number };
+      await ctx.request
+        .post('/api/v1/favorites')
+        .set(authHeader(visitor.accessToken))
+        .send({ bookId: book.id })
+        .expect(201);
+
+      const { resetDemoData } = await import('../../src/scripts/reset-demo');
+      await resetDemoData();
+
+      await ctx.request.get('/api/v1/users/me').set(authHeader(visitor.accessToken)).expect(401);
+      const after = await ctx.request.get(`/api/v1/books/${book.id}`).expect(200);
+      expect(after.body.data.id).toBe(book.id);
+      await ctx.request
+        .post('/api/v1/auth/login')
+        .send({ email: 'customer@bookstore.local', password: 'Customer123!' })
+        .expect(200);
+    });
+  });
 });

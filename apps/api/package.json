@@ -12,6 +12,7 @@
     "dev:db": "tsx src/scripts/dev-db.ts",
     "e2e:serve": "tsx src/scripts/e2e-server.ts",
     "seed": "tsx src/scripts/seed.ts",
+    "reset-demo": "tsx src/scripts/reset-demo.ts",
     "test": "vitest run",
     "test:watch": "vitest",
     "prisma": "prisma",
