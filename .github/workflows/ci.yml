@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @shop-books/api exec prettier --check "src/**/*.ts" "tests/**/*.ts"
+      - run: pnpm --filter @shop-books/api lint
+      - run: pnpm --filter @shop-books/api exec tsc --noEmit
+      - run: pnpm --filter @shop-books/api test
+      - run: pnpm --filter @shop-books/api build
+
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter @shop-books/web exec prettier --check src e2e
+      - run: pnpm --filter @shop-books/web lint
+      - run: pnpm --filter @shop-books/web typecheck
+      - run: pnpm --filter @shop-books/web test
+      - run: pnpm --filter @shop-books/web exec playwright install --with-deps chromium
+      - name: E2E (purchase path) and axe checks
+        run: pnpm --filter @shop-books/web test:e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-traces
+          path: apps/web/test-results
+
+  images:
+    needs: [api, web]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push the API image
+        run: |
+          docker build -f apps/api/Dockerfile -t ghcr.io/${{ github.repository_owner }}/shop-books-api:latest .
+          docker push ghcr.io/${{ github.repository_owner }}/shop-books-api:latest
+      - name: Start a seeded API for the web build (prerendering needs data)
+        run: |
+          pnpm --filter @shop-books/api e2e:serve > api.log 2>&1 &
+          for i in $(seq 1 90); do curl -sf http://127.0.0.1:4100/api/health && break; sleep 2; done
+      - name: Build and push the web image
+        run: |
+          docker build --network host -f apps/web/Dockerfile \
+            --build-arg API_URL=http://127.0.0.1:4100 \
+            --build-arg NEXT_PUBLIC_SITE_URL=https://shop-books.ali-moradi-develop.com \
+            -t ghcr.io/${{ github.repository_owner }}/shop-books-web:latest .
+          docker push ghcr.io/${{ github.repository_owner }}/shop-books-web:latest
+
+  # One stable name to mark as the required status check in branch protection.
+  ci:
+    if: always()
+    needs: [api, web]
+    runs-on: ubuntu-latest
+    steps:
+      - run: test "${{ needs.api.result }}" = success && test "${{ needs.web.result }}" = success

@@ -1,25 +1,22 @@
-# Bookstore API — single-stage Node image (PostgreSQL via DATABASE_URL)
-FROM node:20-bookworm-slim
-
-WORKDIR /app
+# Build context: repository root.  docker build -f apps/api/Dockerfile .
+FROM node:24-bookworm-slim
 
 ENV NODE_ENV=production
+RUN apt-get update -y && apt-get install -y --no-install-recommends openssl ca-certificates \
+  && rm -rf /var/lib/apt/lists/* && corepack enable
+WORKDIR /repo
 
-RUN apt-get update -y && apt-get install -y openssl ca-certificates && rm -rf /var/lib/apt/lists/*
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/api/package.json apps/api/package.json
+COPY apps/api/prisma apps/api/prisma
+# Dev dependencies stay: the container runs `prisma migrate deploy` and the demo reset script.
+RUN pnpm install --frozen-lockfile --prod=false --filter @shop-books/api...
 
-COPY package.json package-lock.json ./
-COPY prisma ./prisma
-RUN npm ci && npm cache clean --force
-
-COPY tsconfig.json ./
-COPY src ./src
-# Build needs typescript; install temporarily
-RUN npm install --no-save typescript tsc-alias && npm run build && npm prune --omit=dev
-
-COPY .env.example ./.env.example
-
-RUN mkdir -p uploads/books
+COPY apps/api apps/api
+WORKDIR /repo/apps/api
+RUN pnpm build && mkdir -p uploads/books
 
 EXPOSE 4000
-
-CMD ["sh", "-c", "npx prisma migrate deploy && node dist/server.js"]
+HEALTHCHECK --interval=15s --timeout=5s --start-period=40s --retries=5 \
+  CMD node -e "fetch('http://127.0.0.1:4000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+CMD ["sh", "-c", "pnpm exec prisma migrate deploy && node dist/server.js"]

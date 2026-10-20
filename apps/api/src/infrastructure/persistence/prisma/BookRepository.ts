@@ -129,6 +129,8 @@ export class PrismaBookRepository implements IBookRepository {
     const row = await getPrisma().book.upsert({
       where: { isbn },
       create: {
+        // Deterministic id: stable URLs and caches across environments and demo resets.
+        id: `bk_${isbn}`,
         title: data.title,
         author: data.author,
         description: data.description,

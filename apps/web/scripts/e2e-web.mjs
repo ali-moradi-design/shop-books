@@ -1,6 +1,6 @@
-// Starts the production web build against the e2e API (waits for it first).
+// Builds and starts the production (standalone) web server against the e2e API (waits for it first).
 import { spawn, spawnSync } from 'node:child_process';
-import { rmSync } from 'node:fs';
+import { cpSync, existsSync, rmSync } from 'node:fs';
 
 const api = process.env.API_URL ?? 'http://localhost:4100';
 const port = process.env.E2E_WEB_PORT ?? '3100';
@@ -22,6 +22,12 @@ const env = {
 rmSync('.next', { recursive: true, force: true }); // the fetch cache would serve ids from an earlier database
 const build = spawnSync('pnpm', ['exec', 'next', 'build'], { stdio: 'inherit', env });
 if (build.status !== 0) process.exit(build.status ?? 1);
-const server = spawn('pnpm', ['exec', 'next', 'start', '-p', port], { stdio: 'inherit', env });
+// Same layout as the Docker image: standalone server plus static assets.
+cpSync('.next/static', '.next/standalone/apps/web/.next/static', { recursive: true });
+if (existsSync('public')) cpSync('public', '.next/standalone/apps/web/public', { recursive: true });
+const server = spawn('node', ['.next/standalone/apps/web/server.js'], {
+  stdio: 'inherit',
+  env: { ...env, PORT: port, HOSTNAME: '127.0.0.1' },
+});
 for (const sig of ['SIGINT', 'SIGTERM']) process.on(sig, () => server.kill(sig));
 server.on('exit', (code) => process.exit(code ?? 0));

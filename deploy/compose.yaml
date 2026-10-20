@@ -1,0 +1,59 @@
+# One shop = three containers: web, api, db. Lives in /srv/apps/shop-books/ on the VPS.
+# Images are built in CI and pulled here: docker compose pull && docker compose up -d
+name: shop-books
+
+services:
+  web:
+    image: ghcr.io/ali-moradi-design/shop-books-web:${TAG:-latest}
+    restart: unless-stopped
+    environment:
+      API_URL: http://api:4000
+      NEXT_PUBLIC_SITE_URL: https://shop-books.ali-moradi-develop.com
+      COOKIE_SECURE: 'true'
+    ports:
+      - '127.0.0.1:${WEB_PORT:-3101}:3000' # Docker bypasses ufw: publish on loopback only
+    depends_on:
+      api:
+        condition: service_healthy
+    mem_limit: 384m
+
+  api:
+    image: ghcr.io/ali-moradi-design/shop-books-api:${TAG:-latest}
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 4000
+      DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/bookstore?schema=public
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      ACCESS_TOKEN_TTL: 12h
+      REFRESH_TOKEN_TTL: 7d
+      CORS_ORIGIN: https://shop-books.ali-moradi-develop.com
+      COOKIE_SECURE: 'true'
+    volumes:
+      - uploads:/repo/apps/api/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    mem_limit: 256m
+    # Not published: only the web container talks to it, over the private network.
+
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: bookstore
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d bookstore']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    mem_limit: 256m
+    # No published ports: reachable only from the api container.
+
+volumes:
+  pgdata:
+  uploads:
