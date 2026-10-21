@@ -8,7 +8,7 @@ import type { ApiData, ApiPaginated } from '@/shared/api';
 import { fetchMyOrders, NEXT_STATUSES, OrderStatusBadge, type Order } from '@/entities/order';
 import type { Book } from '@/entities/book';
 import { updateBookStock, updateOrderStatus } from '@/features/admin/actions';
-import { Button } from '@/shared/ui/Button';
+import { Button, ButtonLink } from '@/shared/ui/Button';
 import { Notice } from '@/shared/ui/Notice';
 import { formatMoney } from '@/shared/lib/money';
 import { firstParam } from '@/shared/lib/query';
@@ -119,9 +119,12 @@ async function Dashboard({ searchParams }: { searchParams: SP }) {
         </div>
       </section>
       <section aria-labelledby="stock-title">
-        <h2 id="stock-title" className="mb-4 font-serif text-3xl">
-          Products and stock
-        </h2>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-4">
+          <h2 id="stock-title" className="font-serif text-3xl">
+            Products and stock
+          </h2>
+          <ButtonLink href="/admin/books/new">+ New book</ButtonLink>
+        </div>
         <div className="overflow-x-auto rounded-lg bg-white">
           <table className="w-full font-sans text-sm">
             <thead className="bg-forest-50">

@@ -79,4 +79,26 @@ test('customer can browse, buy with the fake gateway, and admin sees the order',
   await expect(adminPage.getByRole('row').filter({ hasText: orderId.slice(-8) })).toContainText(
     'Processing',
   );
+
+  // Admin creates a new book and it appears in the catalog
+  await adminPage.getByRole('link', { name: '+ New book' }).click();
+  await expect(adminPage.getByRole('heading', { level: 1, name: 'New book' })).toBeVisible();
+  const bookForm = adminPage.locator('form:visible', {
+    has: adminPage.getByRole('button', { name: 'Create book' }),
+  });
+  await bookForm.locator('[name=title]').fill('The E2E Chronicle');
+  await bookForm.locator('[name=author]').fill('Test Author');
+  await bookForm.locator('[name=description]').fill('A book created by the end-to-end test.');
+  await bookForm.locator('[name=price]').fill('15.50');
+  await bookForm.locator('[name=stock]').fill('7');
+  await bookForm.locator('[name=categories]').fill('fiction, testing');
+  await bookForm.getByRole('button', { name: 'Create book' }).click();
+  await expect(
+    adminPage.getByRole('heading', { level: 1, name: 'The E2E Chronicle' }),
+  ).toBeVisible();
+  await expect(adminPage.getByText('$15.50').first()).toBeVisible();
+  await adminPage.goto('/books?q=E2E+Chronicle');
+  await expect(
+    adminPage.getByRole('link', { name: /The E2E Chronicle by Test Author/ }),
+  ).toBeVisible();
 });
