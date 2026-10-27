@@ -1,7 +1,7 @@
 # Build context: repository root.  docker build -f apps/web/Dockerfile --build-arg API_URL=... .
 # The build prerenders pages, so a reachable API (seeded database) is needed at build time.
 FROM node:24-bookworm-slim AS build
-RUN corepack enable
+RUN npm install -g pnpm@12.15.0
 WORKDIR /repo
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY apps/web/package.json apps/web/package.json

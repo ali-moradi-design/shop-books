@@ -5,7 +5,7 @@ Books demo shop (`shop-books`): `apps/api` (Express 5, Prisma, Postgres, DDD) an
 
 ## Workflow
 
-- Node 24, pnpm 10. Small PRs: branch → local tests → fast-forward merge into `main` → push.
+- Node 24, pnpm 12. Small PRs: branch → local tests → fast-forward merge into `main` → push.
   Do not wait for GitHub CI; the CI workflow is added last.
 - CI is `.github/workflows/ci.yml` (job `ci` is the one to mark as required in branch protection).
 - Local checks: `pnpm --filter @shop-books/api test` (embedded Postgres), `tsc --noEmit`, `pnpm build`, and `pnpm --filter @shop-books/web test:e2e`

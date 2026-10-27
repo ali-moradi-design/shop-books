@@ -1,7 +1,7 @@
 # shop-books
 
 Books demo shop: Express 5 + Prisma + Postgres API (`apps/api`) and a Next.js
-storefront (`apps/web`) in one pnpm workspace. Requirements: Node 24, pnpm 10.
+storefront (`apps/web`) in one pnpm workspace. Requirements: Node 24, pnpm 12.
 
 ```bash
 pnpm install
