@@ -3,7 +3,7 @@ FROM node:24-bookworm-slim
 
 ENV NODE_ENV=production
 RUN apt-get update -y && apt-get install -y --no-install-recommends openssl ca-certificates \
-  && rm -rf /var/lib/apt/lists/* && corepack enable
+  && rm -rf /var/lib/apt/lists/* && npm install -g pnpm@12.15.0
 WORKDIR /repo
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
