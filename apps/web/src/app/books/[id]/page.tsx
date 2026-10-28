@@ -117,8 +117,10 @@ export default async function BookPage({
   return (
     <Shell
       id={id}
+      // Slots cross the 'use cache' boundary and come back as a list, so they need keys.
       buy={
         <Suspense
+          key="buy"
           fallback={
             <aside className="rounded-[10px] border border-forest-200 bg-white p-7 font-sans text-4xl font-bold text-forest-900">
               {formatMoney(book.price, book.currency)}
@@ -129,7 +131,10 @@ export default async function BookPage({
         </Suspense>
       }
       reviews={
-        <Suspense fallback={<p className="pt-16 font-serif text-lg">Loading reviews…</p>}>
+        <Suspense
+          key="reviews"
+          fallback={<p className="pt-16 font-serif text-lg">Loading reviews…</p>}
+        >
           <Reviews bookId={id} />
         </Suspense>
       }
