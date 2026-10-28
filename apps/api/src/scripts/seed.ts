@@ -1,6 +1,7 @@
 import { connectDb } from '../infrastructure/config/db';
 import { repos } from '../infrastructure/composition';
 import { BcryptPasswordHasher } from '../infrastructure/security/password.service';
+import { revalidateWeb } from './revalidate-web';
 
 const SECTIONS = [
   'books',
@@ -641,6 +642,7 @@ async function main() {
   console.log('Demo customer: customer@bookstore.local / Customer123!');
   console.log('Sample discounts: WELCOME10 (10%), FLAT5 ($5 off)');
   console.log('Seed complete.');
+  await revalidateWeb();
   process.exit(0);
 }
 
