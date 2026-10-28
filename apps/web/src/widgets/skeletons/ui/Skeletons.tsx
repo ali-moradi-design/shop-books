@@ -22,7 +22,7 @@ export function HomeSkeleton() {
     <div>
       <LoadingStatus label="Loading the shop…" />
       <div className="relative left-1/2 -mt-10 flex min-h-[520px] w-screen -translate-x-1/2 items-center justify-center bg-wood-500/80 px-6">
-        <div className="w-full max-w-[560px] bg-white p-10">
+        <div className="w-full max-w-[560px] bg-white p-6 sm:p-10">
           <Skeleton className="h-12 w-11/12" />
           <Skeleton className="mt-3 h-12 w-2/3" />
           <Skeleton className="mt-6 h-5 w-full" />
@@ -70,8 +70,8 @@ export function BookDetailSkeleton() {
   return (
     <div>
       <LoadingStatus label="Loading book…" />
-      <Skeleton className="h-4 w-72" />
-      <div className="mt-6 grid gap-12 lg:grid-cols-[420px_1fr_340px]">
+      <Skeleton className="h-4 w-full max-w-72" />
+      <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:[&>*:nth-child(3)]:col-start-2 xl:grid-cols-[minmax(0,380px)_minmax(0,1fr)_340px] xl:gap-12 xl:[&>*:nth-child(3)]:col-start-auto">
         <Skeleton className="aspect-[2/3] w-full max-w-[420px] rounded-sm" />
         <div>
           <Skeleton className="h-12 w-4/5" />

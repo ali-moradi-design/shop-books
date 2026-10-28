@@ -88,7 +88,8 @@ async function Shell({
         <Link href="/">Home</Link> › <Link href="/books">Books</Link> ›{' '}
         <span className="font-semibold text-forest-900">{book.title}</span>
       </p>
-      <div className="mt-6 grid gap-12 lg:grid-cols-[420px_1fr_340px]">
+      {/* lg: cover | details, buy box under the details; xl: three columns. */}
+      <div className="mt-6 grid gap-10 lg:grid-cols-[minmax(0,320px)_minmax(0,1fr)] lg:[&>*:nth-child(3)]:col-start-2 xl:grid-cols-[minmax(0,380px)_minmax(0,1fr)_340px] xl:gap-12 xl:[&>*:nth-child(3)]:col-start-auto">
         <BookInfo book={book} />
         {buy}
       </div>

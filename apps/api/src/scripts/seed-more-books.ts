@@ -20,7 +20,7 @@ export const MORE_BOOKS: {
     price: 9.99,
     stock: 45,
     categories: ['classics', 'fiction'],
-    coverId: 14840327,
+    coverId: 14840482,
   },
   {
     title: 'Moby-Dick',
@@ -170,7 +170,7 @@ export const MORE_BOOKS: {
     price: 14.99,
     stock: 31,
     categories: ['classics', 'fiction'],
-    coverId: 10586757,
+    coverId: 14913337,
   },
   {
     title: 'East of Eden',
@@ -220,7 +220,7 @@ export const MORE_BOOKS: {
     price: 13.99,
     stock: 17,
     categories: ['classics', 'fiction'],
-    coverId: 6468653,
+    coverId: 13961422,
   },
   {
     title: 'Slaughterhouse-Five',
@@ -270,7 +270,7 @@ export const MORE_BOOKS: {
     price: 8.99,
     stock: 14,
     categories: ['classics', 'fiction'],
-    coverId: 15265918,
+    coverId: 14634130,
   },
   {
     title: 'Lolita',
@@ -280,7 +280,7 @@ export const MORE_BOOKS: {
     price: 12.99,
     stock: 31,
     categories: ['classics', 'fiction'],
-    coverId: 12984540,
+    coverId: 13524656,
   },
   {
     title: 'The Kite Runner',
@@ -470,7 +470,7 @@ export const MORE_BOOKS: {
     price: 12.99,
     stock: 14,
     categories: ['fiction'],
-    coverId: 6413803,
+    coverId: 15268301,
   },
   {
     title: '1Q84',
@@ -580,7 +580,7 @@ export const MORE_BOOKS: {
     price: 10.99,
     stock: 6,
     categories: ['mystery', 'classics'],
-    coverId: 11100465,
+    coverId: 14814353,
   },
   {
     title: 'The Murder of Roger Ackroyd',
@@ -610,7 +610,7 @@ export const MORE_BOOKS: {
     price: 7.99,
     stock: 31,
     categories: ['mystery', 'classics'],
-    coverId: 13405534,
+    coverId: 15124951,
   },
   {
     title: 'The Big Sleep',
@@ -620,7 +620,7 @@ export const MORE_BOOKS: {
     price: 11.99,
     stock: 26,
     categories: ['mystery', 'classics'],
-    coverId: 7268475,
+    coverId: 11722615,
   },
   {
     title: 'The Silence of the Lambs',
@@ -680,7 +680,7 @@ export const MORE_BOOKS: {
     price: 12.99,
     stock: 43,
     categories: ['mystery', 'thriller', 'classics'],
-    coverId: 6567966,
+    coverId: 71833,
   },
   {
     title: 'The Thursday Murder Club',
@@ -710,7 +710,7 @@ export const MORE_BOOKS: {
     price: 12.99,
     stock: 26,
     categories: ['thriller'],
-    coverId: 499340,
+    coverId: 10095995,
   },
   {
     title: 'Jurassic Park',
@@ -730,7 +730,7 @@ export const MORE_BOOKS: {
     price: 11.99,
     stock: 17,
     categories: ['sci-fi', 'classics'],
-    coverId: 14612610,
+    coverId: 7887525,
   },
   {
     title: 'I, Robot',
@@ -810,7 +810,7 @@ export const MORE_BOOKS: {
     price: 11.49,
     stock: 20,
     categories: ['sci-fi', 'classics'],
-    coverId: 207515,
+    coverId: 11813881,
   },
   {
     title: 'Hyperion',
@@ -920,7 +920,7 @@ export const MORE_BOOKS: {
     price: 14.99,
     stock: 3,
     categories: ['fantasy', 'classics'],
-    coverId: 14626055,
+    coverId: 14951359,
   },
   {
     title: 'Harry Potter and the Prisoner of Azkaban',
@@ -950,7 +950,7 @@ export const MORE_BOOKS: {
     price: 17.99,
     stock: 20,
     categories: ['fantasy'],
-    coverId: 9269962,
+    coverId: 15237705,
   },
   {
     title: 'The Name of the Wind',
@@ -1000,7 +1000,7 @@ export const MORE_BOOKS: {
     price: 11.99,
     stock: 45,
     categories: ['fantasy', 'humor'],
-    coverId: 14647238,
+    coverId: 38430,
   },
   {
     title: 'The Lion, the Witch and the Wardrobe',
@@ -1010,7 +1010,7 @@ export const MORE_BOOKS: {
     price: 9.99,
     stock: 12,
     categories: ['fantasy', 'young-adult', 'classics'],
-    coverId: 8441376,
+    coverId: 10123765,
   },
   {
     title: "Alice's Adventures in Wonderland",
@@ -1020,7 +1020,7 @@ export const MORE_BOOKS: {
     price: 7.99,
     stock: 31,
     categories: ['fantasy', 'classics'],
-    coverId: 14572004,
+    coverId: 13886898,
   },
   {
     title: 'The Princess Bride',
@@ -1030,7 +1030,7 @@ export const MORE_BOOKS: {
     price: 12.99,
     stock: 23,
     categories: ['fantasy', 'adventure'],
-    coverId: 9284881,
+    coverId: 209528,
   },
   {
     title: 'Circe',
@@ -1140,7 +1140,7 @@ export const MORE_BOOKS: {
     price: 18.99,
     stock: 31,
     categories: ['horror'],
-    coverId: 8569284,
+    coverId: 15255912,
   },
   {
     title: 'The Shining',
@@ -1160,7 +1160,7 @@ export const MORE_BOOKS: {
     price: 11.99,
     stock: 17,
     categories: ['horror'],
-    coverId: 9256043,
+    coverId: 15228835,
   },
   {
     title: 'Interview with the Vampire',
@@ -1190,7 +1190,7 @@ export const MORE_BOOKS: {
     price: 17.49,
     stock: 26,
     categories: ['history', 'nonfiction'],
-    coverId: 6616967,
+    coverId: 13989867,
   },
   {
     title: 'SPQR',
@@ -1240,7 +1240,7 @@ export const MORE_BOOKS: {
     price: 19.99,
     stock: 9,
     categories: ['biography', 'nonfiction'],
-    coverId: 8824664,
+    coverId: 10703591,
   },
   {
     title: 'Steve Jobs',
@@ -1270,7 +1270,7 @@ export const MORE_BOOKS: {
     price: 15.99,
     stock: 11,
     categories: ['science', 'nonfiction'],
-    coverId: 8364866,
+    coverId: 10441665,
   },
   {
     title: 'Into the Wild',
@@ -1280,7 +1280,7 @@ export const MORE_BOOKS: {
     price: 13.99,
     stock: 31,
     categories: ['nonfiction', 'adventure'],
-    coverId: 1377482,
+    coverId: 14586157,
   },
   {
     title: 'Into Thin Air',
@@ -1390,7 +1390,7 @@ export const MORE_BOOKS: {
     price: 9.99,
     stock: 9,
     categories: ['philosophy', 'classics'],
-    coverId: 211529,
+    coverId: 13124925,
   },
   {
     title: 'Freakonomics',
@@ -1410,7 +1410,7 @@ export const MORE_BOOKS: {
     price: 16.99,
     stock: 42,
     categories: ['self-help', 'business'],
-    coverId: 12539702,
+    coverId: 12886417,
   },
   {
     title: 'The 7 Habits of Highly Effective People',
@@ -1430,7 +1430,7 @@ export const MORE_BOOKS: {
     price: 12.99,
     stock: 42,
     categories: ['self-help', 'business'],
-    coverId: 13845974,
+    coverId: 13112610,
   },
   {
     title: 'The Power of Habit',
@@ -1440,7 +1440,7 @@ export const MORE_BOOKS: {
     price: 15.99,
     stock: 28,
     categories: ['self-help', 'psychology'],
-    coverId: 9078085,
+    coverId: 8753107,
   },
   {
     title: 'Deep Work',
@@ -1460,7 +1460,7 @@ export const MORE_BOOKS: {
     price: 14.99,
     stock: 14,
     categories: ['business'],
-    coverId: 9002334,
+    coverId: 8788173,
   },
   {
     title: 'The Lean Startup',
@@ -1490,7 +1490,7 @@ export const MORE_BOOKS: {
     price: 19.99,
     stock: 37,
     categories: ['business'],
-    coverId: 36434,
+    coverId: 10328222,
   },
   {
     title: 'Kitchen Confidential',
@@ -1513,14 +1513,14 @@ export const MORE_BOOKS: {
     coverId: 254207,
   },
   {
-    title: 'Code Complete',
-    author: 'Steve McConnell',
-    description: 'A practical handbook of software construction.',
-    isbn: '9780735619678',
-    price: 44.99,
+    title: "The Cuckoo's Egg",
+    author: 'Clifford Stoll',
+    description: 'An astronomer tracks a spy through the early internet.',
+    isbn: '9781416507789',
+    price: 16.99,
     stock: 39,
-    categories: ['programming', 'software'],
-    coverId: 461500,
+    categories: ['programming', 'nonfiction'],
+    coverId: 759600,
   },
   {
     title: 'Design Patterns',
@@ -1573,14 +1573,14 @@ export const MORE_BOOKS: {
     coverId: 7318893,
   },
   {
-    title: 'Head First Design Patterns',
-    author: 'Eric Freeman',
-    description: 'A brain-friendly guide to design patterns.',
-    isbn: '9780596007126',
-    price: 44.99,
+    title: 'The Soul of a New Machine',
+    author: 'Tracy Kidder',
+    description: 'A team races to build a new computer in a year.',
+    isbn: '9780380711154',
+    price: 17.99,
     stock: 17,
-    categories: ['programming', 'software'],
-    coverId: 13345163, // full 2nd-edition cover; the 1st-edition scan is cropped
+    categories: ['programming', 'history'],
+    coverId: 234917,
   },
   {
     title: 'Python Crash Course',
