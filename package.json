@@ -8,8 +8,17 @@
     "node": ">=24"
   },
   "scripts": {
+    "db:up": "docker compose up -d --wait postgres",
+    "db:down": "docker compose stop postgres",
+    "db:embedded": "pnpm --filter @shop-books/api dev:db",
+    "migrate": "pnpm --filter @shop-books/api migrate",
+    "seed": "pnpm --filter @shop-books/api seed",
+    "dev": "pnpm --parallel --filter @shop-books/api --filter @shop-books/web dev",
+    "dev:api": "pnpm --filter @shop-books/api dev",
+    "dev:web": "pnpm --filter @shop-books/web dev",
+    "build": "pnpm -r build",
     "lint": "pnpm -r --if-present lint",
-    "test": "pnpm -r test",
-    "build": "pnpm -r build"
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test"
   }
 }

@@ -40,7 +40,7 @@ prisma/
 
 ```bash
 cp .env.example .env
-# Edit DATABASE_URL, e.g. postgresql://postgres:postgres@127.0.0.1:5432/bookstore?schema=public
+# Edit DATABASE_URL, e.g. postgresql://postgres:postgres@127.0.0.1:54320/bookstore?schema=public
 npm install
 npx prisma migrate dev   # or: npx prisma db push
 npm run seed
