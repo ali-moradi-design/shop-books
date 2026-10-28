@@ -124,6 +124,7 @@ const COVER_OVERRIDES: Record<string, number> = {
   '9780062315007': 15076026,
   '9780141439846': 12216503,
   '9781098124038': 12539693,
+  '9780547928227': 8406760, // The Hobbit: the ISBN cover is a poor scan
 };
 
 /** Books shown in Staff picks on the home page. */
