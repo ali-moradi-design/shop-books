@@ -14,8 +14,10 @@ export function validate(schemas: Schemas) {
         req.body = schemas.body.parse(req.body);
       }
       if (schemas.query) {
-        const parsed = schemas.query.parse(req.query);
-        Object.assign(req.query, parsed);
+        // Express 5 rebuilds req.query on every read, so assigning into it is lost;
+        // replace the property so handlers see the parsed values (booleans, numbers).
+        const parsed: unknown = schemas.query.parse(req.query);
+        Object.defineProperty(req, 'query', { value: parsed, writable: true, configurable: true });
       }
       if (schemas.params) {
         const parsed = schemas.params.parse(req.params);
