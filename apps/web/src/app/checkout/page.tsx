@@ -6,6 +6,7 @@ import { requireToken } from '@/shared/lib/auth';
 import { cartSubtotal, fetchCartLines } from '@/features/cart/api';
 import { CheckoutForm } from '@/features/checkout/ui/CheckoutForm';
 import { formatMoney } from '@/shared/lib/money';
+import { RowsSkeleton } from '@/widgets/skeletons';
 
 export const metadata: Metadata = { title: 'Checkout', robots: { index: false } };
 
@@ -45,7 +46,7 @@ export default function CheckoutPage() {
   return (
     <>
       <h1 className="mb-8 font-serif text-4xl font-medium text-forest-900">Checkout</h1>
-      <Suspense fallback={<p className="font-serif text-lg">Loading…</p>}>
+      <Suspense fallback={<RowsSkeleton rows={3} label="Loading checkout…" />}>
         <Checkout />
       </Suspense>
     </>

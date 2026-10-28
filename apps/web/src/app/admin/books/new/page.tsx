@@ -5,6 +5,7 @@ import { connection } from 'next/server';
 import { notFound } from 'next/navigation';
 import { getMe, isAdmin, requireToken } from '@/shared/lib/auth';
 import { NewBookForm } from '@/features/admin/ui/NewBookForm';
+import { RowsSkeleton } from '@/widgets/skeletons';
 
 export const metadata: Metadata = { title: 'New book', robots: { index: false } };
 
@@ -24,7 +25,7 @@ export default function NewBookPage() {
         </Link>
       </p>
       <h1 className="mb-8 font-serif text-4xl font-medium text-forest-900">New book</h1>
-      <Suspense fallback={<p className="font-serif text-lg">Loading…</p>}>
+      <Suspense fallback={<RowsSkeleton rows={4} />}>
         <Guard />
       </Suspense>
     </>

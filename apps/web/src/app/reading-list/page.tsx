@@ -8,6 +8,7 @@ import { BookCover } from '@/entities/book';
 import { toggleFavorite } from '@/features/favorites/actions';
 import { Button } from '@/shared/ui/Button';
 import { formatMoney } from '@/shared/lib/money';
+import { RowsSkeleton } from '@/widgets/skeletons';
 
 export const metadata: Metadata = { title: 'Reading list', robots: { index: false } };
 
@@ -49,7 +50,7 @@ export default function ReadingListPage() {
   return (
     <>
       <h1 className="mb-8 font-serif text-4xl font-medium text-forest-900">Reading list</h1>
-      <Suspense fallback={<p className="font-serif text-lg">Loading…</p>}>
+      <Suspense fallback={<RowsSkeleton label="Loading reading list…" />}>
         <List />
       </Suspense>
     </>

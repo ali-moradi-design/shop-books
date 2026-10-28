@@ -12,6 +12,7 @@ import { Button, ButtonLink } from '@/shared/ui/Button';
 import { Notice } from '@/shared/ui/Notice';
 import { formatMoney } from '@/shared/lib/money';
 import { firstParam } from '@/shared/lib/query';
+import { RowsSkeleton } from '@/widgets/skeletons';
 
 export const metadata: Metadata = { title: 'Admin', robots: { index: false } };
 
@@ -178,7 +179,7 @@ export default function AdminPage({ searchParams }: { searchParams: SP }) {
   return (
     <>
       <h1 className="mb-8 font-serif text-4xl font-medium text-forest-900">Admin</h1>
-      <Suspense fallback={<p className="font-serif text-lg">Loading dashboard…</p>}>
+      <Suspense fallback={<RowsSkeleton rows={6} label="Loading dashboard…" />}>
         <Dashboard searchParams={searchParams} />
       </Suspense>
     </>

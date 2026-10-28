@@ -9,6 +9,7 @@ import { Button } from '@/shared/ui/Button';
 import { Notice } from '@/shared/ui/Notice';
 import { formatMoney } from '@/shared/lib/money';
 import { firstParam } from '@/shared/lib/query';
+import { FormSkeleton } from '@/widgets/skeletons';
 
 export const metadata: Metadata = { title: 'Secure payment', robots: { index: false } };
 
@@ -93,7 +94,7 @@ export default function Page({
   searchParams: SP;
 }) {
   return (
-    <Suspense fallback={<p className="font-serif text-lg">Loading…</p>}>
+    <Suspense fallback={<FormSkeleton fields={3} label="Loading payment…" />}>
       <Gateway params={params} searchParams={searchParams} />
     </Suspense>
   );

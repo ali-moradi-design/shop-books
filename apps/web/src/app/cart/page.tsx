@@ -4,6 +4,7 @@ import { connection } from 'next/server';
 import { requireToken } from '@/shared/lib/auth';
 import { fetchCartLines } from '@/features/cart/api';
 import { CartView } from '@/widgets/cart';
+import { ListSkeleton } from '@/widgets/skeletons';
 
 export const metadata: Metadata = { title: 'Your cart', robots: { index: false } };
 
@@ -24,7 +25,7 @@ async function Cart() {
 
 export default function CartPage() {
   return (
-    <Suspense fallback={<p className="font-serif text-lg">Loading your cart…</p>}>
+    <Suspense fallback={<ListSkeleton rows={3} label="Loading your cart…" />}>
       <Cart />
     </Suspense>
   );

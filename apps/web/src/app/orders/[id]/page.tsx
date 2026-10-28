@@ -7,6 +7,7 @@ import { fetchOrder, OrderStatusBadge } from '@/entities/order';
 import { ButtonLink } from '@/shared/ui/Button';
 import { Notice } from '@/shared/ui/Notice';
 import { formatMoney } from '@/shared/lib/money';
+import { ListSkeleton } from '@/widgets/skeletons';
 
 export const metadata: Metadata = { title: 'Order', robots: { index: false } };
 
@@ -92,7 +93,7 @@ export default function Page({
   searchParams: SP;
 }) {
   return (
-    <Suspense fallback={<p className="font-serif text-lg">Loading…</p>}>
+    <Suspense fallback={<ListSkeleton rows={3} label="Loading order…" />}>
       <OrderDetail params={params} searchParams={searchParams} />
     </Suspense>
   );

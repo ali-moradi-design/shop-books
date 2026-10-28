@@ -3,10 +3,13 @@ import { Suspense } from 'react';
 import { BookCard, fetchBooks, fetchFacets, type BookListParams } from '@/entities/book';
 import { FilterSidebar, Pagination, type Filters } from '@/widgets/catalog';
 import { firstParam } from '@/shared/lib/query';
+import { CatalogSkeleton } from '@/widgets/skeletons';
 
 export const metadata: Metadata = {
   title: 'Browse books',
-  description: 'Search by title, author, genre or ISBN.',
+  description:
+    'Browse every book in the shop. Filter by genre, author, series and price, or search by title, author or ISBN.',
+  alternates: { canonical: '/books' },
 };
 
 type SP = Promise<Record<string, string | string[] | undefined>>;
@@ -87,7 +90,7 @@ async function Results({ searchParams }: { searchParams: SP }) {
             No books match these filters. Try a different search or clear a filter.
           </p>
         ) : (
-          <ul className="grid grid-cols-2 gap-x-7 gap-y-10 md:grid-cols-3 xl:grid-cols-4">
+          <ul className="grid grid-cols-2 gap-x-7 gap-y-10 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
             {result.data.map((b) => (
               <li key={b.id}>
                 <BookCard book={b} />
@@ -103,7 +106,7 @@ async function Results({ searchParams }: { searchParams: SP }) {
 
 export default function BooksPage({ searchParams }: { searchParams: SP }) {
   return (
-    <Suspense fallback={<p className="font-serif text-lg">Loading books…</p>}>
+    <Suspense fallback={<CatalogSkeleton />}>
       <Results searchParams={searchParams} />
     </Suspense>
   );
