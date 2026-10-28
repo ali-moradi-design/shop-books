@@ -95,17 +95,6 @@
   .book-cover[data-state='loading'] > img {
     @apply opacity-0;
   }
-  /* Wide covers: keep the 2:3 slot so cards line up, show the whole cover at its bottom. */
-  .book-cover[data-fit='contain'] {
-    @apply flex aspect-[2/3] items-end;
-    box-shadow: none !important; /* beats a shadow passed in className; the image carries it */
-  }
-  .book-cover[data-fit='contain']::after {
-    @apply hidden;
-  }
-  .book-cover[data-fit='contain'] > img {
-    @apply aspect-auto h-auto shadow-book transition-shadow duration-200 hover:shadow-book-hover;
-  }
   /* Without JavaScript nothing marks the cover loaded, so show it as is. */
   @media (scripting: none) {
     .book-cover[data-state='loading'] {

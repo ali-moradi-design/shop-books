@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { BookCard, fetchBooks, fetchFacets, type BookListParams } from '@/entities/book';
-import { FilterSidebar, Pagination, type Filters } from '@/widgets/catalog';
+import { FilterPanel, FilterSidebar, Pagination, type Filters } from '@/widgets/catalog';
 import { firstParam } from '@/shared/lib/query';
 import { CatalogSkeleton } from '@/widgets/skeletons';
 
@@ -71,10 +71,10 @@ async function Results({ searchParams }: { searchParams: SP }) {
       ? filters.category
       : 'All books';
   return (
-    <div className="grid gap-12 lg:grid-cols-[280px_1fr]">
-      <aside>
+    <div className="grid gap-8 lg:grid-cols-[280px_1fr] lg:gap-12">
+      <FilterPanel>
         <FilterSidebar facets={facets} filters={filters} />
-      </aside>
+      </FilterPanel>
       <section aria-labelledby="results-title">
         <h1
           id="results-title"

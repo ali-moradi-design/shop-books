@@ -44,7 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" className={`${inter.variable} ${sourceSerif.variable}`}>
       {/* column layout: main grows, so the footer sits at the bottom on short pages */}
-      <body className="flex flex-col">
+      <body className="flex flex-col overflow-x-clip">
         <a
           href="#main"
           className="sr-only focus:not-sr-only focus:absolute focus:z-50 focus:bg-white focus:p-3"

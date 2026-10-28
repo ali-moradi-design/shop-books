@@ -1,5 +1,6 @@
 import { connectDb } from '../infrastructure/config/db';
 import { repos } from '../infrastructure/composition';
+import { prisma } from '../infrastructure/persistence/prisma/client';
 import { BcryptPasswordHasher } from '../infrastructure/security/password.service';
 import { revalidateWeb } from './revalidate-web';
 import { MORE_BOOKS } from './seed-more-books';
@@ -125,7 +126,19 @@ const COVER_OVERRIDES: Record<string, number> = {
   '9780141439846': 12216503,
   '9781098124038': 12539693,
   '9780547928227': 8406760, // The Hobbit: the ISBN cover is a poor scan
+  '9780316769488': 14577326,
+  '9780060850524': 15170942,
+  '9780451526342': 15225419,
+  '9780441172719': 258358,
+  '9780316037709': 7090206,
 };
+
+/**
+ * Books dropped from the demo catalog (their covers do not fit the 2:3 frame).
+ * The seed removes them from older databases unless an order, cart or review
+ * still points at them.
+ */
+const RETIRED_ISBNS = ['9780596007126', '9780735619678', '9780262033848'];
 
 /** Books shown in Staff picks on the home page. */
 const FEATURED_ISBNS = new Set([
@@ -228,13 +241,13 @@ const FIRST_BOOKS: {
     categories: ['algorithms', 'programming'],
   },
   {
-    title: 'Introduction to Algorithms',
-    author: 'Thomas H. Cormen et al.',
-    description: 'Comprehensive textbook on algorithms (CLRS).',
-    isbn: '9780262033848',
-    price: 89.99,
+    title: 'Ghost in the Wires',
+    author: 'Kevin Mitnick',
+    description: 'The memoir of the world’s most wanted hacker.',
+    isbn: '9780316037709',
+    price: 18.99,
     stock: 8,
-    categories: ['algorithms'],
+    categories: ['programming', 'biography'],
   },
   {
     title: 'Building Microservices',
@@ -635,6 +648,16 @@ export async function runSeed(options: SeedOptions = {}): Promise<void> {
       featured,
       featuredOrder: featured ? featuredOrder++ : 0,
     });
+  }
+
+  for (const isbn of RETIRED_ISBNS) {
+    const id = `bk_${isbn}`;
+    const [orders, carts, reviews] = await Promise.all([
+      prisma.orderItem.count({ where: { bookId: id } }),
+      prisma.cartItem.count({ where: { bookId: id } }),
+      prisma.review.count({ where: { bookId: id } }),
+    ]);
+    if (orders + carts + reviews === 0) await prisma.book.deleteMany({ where: { id } });
   }
 
   const sampleDiscounts = [

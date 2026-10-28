@@ -6,13 +6,10 @@ import { cn } from '@/shared/lib/cn';
 
 type CoverState = 'loading' | 'loaded' | 'error';
 
-/** Covers wider than this (width / height) would lose their edges in the 2:3 frame. */
-const WIDE_COVER = 0.72;
-
 /**
  * Cover with the hinge overlay and soft shadow (`.book-cover` in globals.css).
  * Shows a pulsing placeholder until the image arrives, then fades it in; a broken
- * image falls back to the title card. Wide covers keep their full shape, bottom-aligned.
+ * image falls back to the title card.
  */
 export function BookCover({
   book,
@@ -24,11 +21,9 @@ export function BookCover({
   priority?: boolean;
 }) {
   const [state, setState] = useState<CoverState>('loading');
-  const [wide, setWide] = useState(false);
 
   const settle = useCallback((img: HTMLImageElement) => {
     if (img.naturalWidth === 0) return setState('error');
-    setWide(img.naturalWidth / img.naturalHeight > WIDE_COVER);
     setState('loaded');
   }, []);
 
@@ -51,11 +46,7 @@ export function BookCover({
   }
 
   return (
-    <span
-      className={cn('book-cover', className)}
-      data-state={state}
-      data-fit={wide ? 'contain' : undefined}
-    >
+    <span className={cn('book-cover', className)} data-state={state}>
       {/* Covers come from third-party hosts; the optimizer adds nothing for them. */}
       <img
         ref={imgRef}
