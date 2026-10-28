@@ -26,10 +26,9 @@ export async function resetDemoData(): Promise<void> {
   await runSeed();
 }
 
-const isCli =
-  typeof process.argv[1] === 'string' &&
-  (process.argv[1].endsWith('scripts/reset-demo.ts') ||
-    process.argv[1].endsWith('scripts/reset-demo.js'));
+// argv[1] uses backslashes on Windows, so compare with forward slashes
+const entry = (process.argv[1] ?? '').replace(/\\/g, '/');
+const isCli = entry.endsWith('scripts/reset-demo.ts') || entry.endsWith('scripts/reset-demo.js');
 
 if (isCli) {
   connectDb()
