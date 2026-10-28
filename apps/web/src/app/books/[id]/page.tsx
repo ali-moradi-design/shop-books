@@ -7,6 +7,7 @@ import { fetchBook, fetchBooks } from '@/entities/book';
 import { BookInfo, BuyBox, LookInside, Related, Reviews } from '@/widgets/book-detail';
 import { firstParam } from '@/shared/lib/query';
 import { formatMoney } from '@/shared/lib/money';
+import { ReviewsSkeleton } from '@/widgets/skeletons';
 
 type Params = Promise<{ id: string }>;
 
@@ -131,10 +132,7 @@ export default async function BookPage({
         </Suspense>
       }
       reviews={
-        <Suspense
-          key="reviews"
-          fallback={<p className="pt-16 font-serif text-lg">Loading reviews…</p>}
-        >
+        <Suspense key="reviews" fallback={<ReviewsSkeleton />}>
           <Reviews bookId={id} />
         </Suspense>
       }

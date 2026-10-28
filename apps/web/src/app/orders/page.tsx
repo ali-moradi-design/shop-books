@@ -5,6 +5,7 @@ import { connection } from 'next/server';
 import { requireToken } from '@/shared/lib/auth';
 import { fetchMyOrders, OrderStatusBadge } from '@/entities/order';
 import { formatMoney } from '@/shared/lib/money';
+import { RowsSkeleton } from '@/widgets/skeletons';
 
 export const metadata: Metadata = { title: 'My orders', robots: { index: false } };
 
@@ -52,7 +53,7 @@ export default function OrdersPage() {
   return (
     <>
       <h1 className="mb-8 font-serif text-4xl font-medium text-forest-900">My orders</h1>
-      <Suspense fallback={<p className="font-serif text-lg">Loading orders…</p>}>
+      <Suspense fallback={<RowsSkeleton label="Loading orders…" />}>
         <Orders />
       </Suspense>
     </>

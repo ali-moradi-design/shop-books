@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { CartBadge } from '@/features/cart/ui/CartBadge';
+import { Logo } from '@/shared/ui/Logo';
 import { UserMenu } from './UserMenu';
 
 const nav = [
@@ -16,8 +17,8 @@ export function SiteHeader() {
     <header>
       <div className="bg-forest-900 text-white">
         <div className="mx-auto flex max-w-shop flex-wrap items-center gap-x-6 gap-y-3 px-6 py-3">
-          <Link href="/" className="font-serif text-2xl font-medium">
-            Bay Book Company
+          <Link href="/" aria-label="Bay Book Company, home" className="text-white">
+            <Logo />
           </Link>
           <form
             action="/books"
@@ -41,7 +42,7 @@ export function SiteHeader() {
               Search
             </button>
           </form>
-          <div className="flex items-center gap-3 font-sans text-sm">
+          <div className="ml-auto flex flex-wrap items-center gap-2 font-sans text-sm sm:gap-3">
             <Suspense fallback={<span className="px-3 py-1.5">…</span>}>
               <UserMenu />
             </Suspense>
@@ -52,7 +53,7 @@ export function SiteHeader() {
         </div>
       </div>
       <nav aria-label="Primary" className="border-b border-forest-200 bg-white">
-        <ul className="mx-auto flex max-w-shop gap-8 px-6 font-serif text-base">
+        <ul className="mx-auto flex max-w-shop gap-8 overflow-x-auto whitespace-nowrap px-6 font-serif text-base">
           {nav.map((n) => (
             <li key={n.href}>
               <Link href={n.href} className="flex h-11 items-center hover:text-forest-500">

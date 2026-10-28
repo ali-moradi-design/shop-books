@@ -1,12 +1,14 @@
 import Link from 'next/link';
 import { connection } from 'next/server';
+import { logout } from '@/features/auth/actions';
 import { getMe, isAdmin } from '@/shared/lib/auth';
 
 /** Dynamic hole: signed-in state. */
 export async function UserMenu() {
   await connection();
   const me = await getMe();
-  const link = 'rounded border border-mint-500/60 px-3 py-1.5 hover:bg-forest-700';
+  const link =
+    'whitespace-nowrap rounded border border-mint-500/60 px-3 py-1.5 hover:bg-forest-700';
   if (!me) {
     return (
       <>
@@ -26,9 +28,14 @@ export async function UserMenu() {
           Admin
         </Link>
       )}
-      <Link href="/orders" className={link} title={me.email}>
-        {me.name.split(' ')[0]}
+      <Link href="/orders" className={link} title={`Signed in as ${me.email}`}>
+        My orders
       </Link>
+      <form action={logout}>
+        <button type="submit" className={link}>
+          Sign out
+        </button>
+      </form>
     </>
   );
 }

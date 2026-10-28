@@ -23,7 +23,7 @@ export async function CartBadge() {
   return (
     <Link
       href="/cart"
-      className="rounded border border-mint-500/60 px-3 py-1.5 hover:bg-forest-700"
+      className="whitespace-nowrap rounded border border-mint-500/60 px-3 py-1.5 hover:bg-forest-700"
     >
       Cart ({count})
     </Link>
