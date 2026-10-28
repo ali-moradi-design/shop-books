@@ -7,22 +7,21 @@
     ],
     "outDir": "dist",
     "rootDir": "src",
-    "baseUrl": ".",
     "paths": {
       "@domain/*": [
-        "src/domain/*"
+        "./src/domain/*"
       ],
       "@application/*": [
-        "src/application/*"
+        "./src/application/*"
       ],
       "@infrastructure/*": [
-        "src/infrastructure/*"
+        "./src/infrastructure/*"
       ],
       "@interfaces/*": [
-        "src/interfaces/*"
+        "./src/interfaces/*"
       ],
       "@shared/*": [
-        "src/shared/*"
+        "./src/shared/*"
       ]
     },
     "strict": true,
@@ -40,8 +39,7 @@
     "moduleResolution": "Node16",
     "types": [
       "node"
-    ],
-    "ignoreDeprecations": "5.0"
+    ]
   },
   "include": [
     "src/**/*"
