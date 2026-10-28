@@ -1,6 +1,7 @@
 import { connectDb } from '../infrastructure/config/db';
 import { prisma } from '../infrastructure/persistence/prisma/client';
 import { runSeed } from './seed';
+import { revalidateWeb } from './revalidate-web';
 
 const DEMO_EMAILS = ['admin@bookstore.local', 'customer@bookstore.local'];
 
@@ -33,6 +34,7 @@ const isCli = entry.endsWith('scripts/reset-demo.ts') || entry.endsWith('scripts
 if (isCli) {
   connectDb()
     .then(resetDemoData)
+    .then(revalidateWeb)
     .then(() => {
       console.log('Demo data reset.');
       process.exit(0);
