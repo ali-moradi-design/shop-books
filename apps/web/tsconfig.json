@@ -38,8 +38,7 @@
       "@/widgets/*": [
         "./src/widgets/*"
       ]
-    },
-    "baseUrl": "."
+    }
   },
   "include": [
     "next-env.d.ts",
