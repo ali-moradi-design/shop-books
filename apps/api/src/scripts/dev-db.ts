@@ -3,7 +3,7 @@ import path from 'node:path';
 
 /** Local Postgres for development without Docker. Data lives in .pgdata/dev. */
 const dataDir = path.resolve(process.cwd(), '.pgdata/dev');
-const port = Number(process.env.DEV_DB_PORT ?? 5432);
+const port = Number(process.env.DEV_DB_PORT ?? 54320);
 const fresh = !fs.existsSync(path.join(dataDir, 'PG_VERSION'));
 
 async function main() {

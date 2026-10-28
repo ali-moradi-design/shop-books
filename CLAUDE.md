@@ -10,7 +10,7 @@ Books demo shop (`shop-books`): `apps/api` (Express 5, Prisma, Postgres, DDD) an
 - CI is `.github/workflows/ci.yml` (job `ci` is the one to mark as required in branch protection).
 - Local checks: `pnpm --filter @shop-books/api test` (embedded Postgres), `tsc --noEmit`, `pnpm build`, and `pnpm --filter @shop-books/web test:e2e`
   (purchase path + axe; starts its own API/Postgres/web, ports 4100/3100/55499; free them with `fuser -k`).
-  Web build needs the API running (`pnpm dev:db`, `pnpm migrate`, `pnpm seed`, `pnpm dev` in `apps/api`).
+  Web build needs the API running (`pnpm db:up` or `pnpm db:embedded`, then `pnpm migrate`, `pnpm seed`, `pnpm dev:api` at the root).
 - Running as root: `chmod 777 apps/api/.pgdata` before tests (embedded Postgres drops privileges).
 - Use graphify to save tokens: query `graphify-out/graph.json` (`graphify query "..."`) before
   reading many files. Rebuild with `/graphify . --update`. `graphify-out/` is not committed.
@@ -19,7 +19,8 @@ Books demo shop (`shop-books`): `apps/api` (Express 5, Prisma, Postgres, DDD) an
 
 - English only (no i18n). Money is integer minor units. Book ids are `bk_<isbn>`.
 - Auth: the web app stores the API tokens in its own httpOnly cookies (`sb_access`, `sb_refresh`).
-- Docker/compose in `apps/*/Dockerfile` and `deploy/` are written but not run in the cloud sandbox (no Docker daemon).
+- Local Docker: root `compose.yaml` (Postgres on 127.0.0.1:54320; `docker compose up -d --build` runs the whole stack).
+  Production compose is in `deploy/`. The sandbox may need `sudo dockerd` started first.
 
 ## Language
 

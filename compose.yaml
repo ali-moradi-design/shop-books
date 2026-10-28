@@ -1,0 +1,70 @@
+# Local stack: `docker compose up -d --build` runs Postgres, the API and the storefront
+# (http://localhost:3000). For `pnpm dev`, start only the database: `pnpm db:up`.
+# Production compose lives in deploy/.
+name: shop-books
+
+x-api-env: &api-env
+  NODE_ENV: development # plain-http cookies
+  PORT: 4000
+  DATABASE_URL: postgresql://postgres:postgres@postgres:5432/bookstore?schema=public
+  JWT_ACCESS_SECRET: local-access-secret
+  JWT_REFRESH_SECRET: local-refresh-secret
+  CORS_ORIGIN: http://localhost:3000
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: bookstore
+    ports:
+      - "127.0.0.1:54320:5432" # 54320 so it never clashes with a Postgres already on 5432
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d bookstore"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    mem_limit: 256m
+
+  # applies the migrations and loads the demo books and accounts on every start
+  # (upserts, so it is safe to repeat)
+  seed:
+    build: { context: ., dockerfile: apps/api/Dockerfile }
+    image: shop-books-api:local
+    command: ["sh", "-c", "pnpm exec prisma migrate deploy && pnpm seed"]
+    environment: *api-env
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  api:
+    build: { context: ., dockerfile: apps/api/Dockerfile }
+    image: shop-books-api:local
+    command: ["node", "dist/server.js"]
+    environment: *api-env
+    ports:
+      - "127.0.0.1:4000:4000"
+    volumes:
+      - uploads:/repo/apps/api/uploads
+    depends_on:
+      seed: { condition: service_completed_successfully }
+    restart: unless-stopped
+
+  web:
+    build: { context: ., dockerfile: apps/web/Dockerfile, target: local }
+    image: shop-books-web:local
+    environment:
+      API_URL: http://api:4000
+      NEXT_PUBLIC_API_URL: http://localhost:4000
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    ports:
+      - "127.0.0.1:3000:3000"
+    depends_on:
+      api: { condition: service_healthy }
+    restart: unless-stopped
+
+volumes:
+  pgdata:
+  uploads:

@@ -21,10 +21,14 @@ Walk through in this order. Each step is one merged branch; `git log --oneline` 
    admin sees the order, admin creates a book) and axe checks on 6 pages. All run locally.
 7. **Deploy and CI** (written, not run here): `apps/*/Dockerfile`, `deploy/` (compose with 3 containers,
    memory limits, loopback port, nginx site), `.github/workflows/ci.yml` (job `ci` = required check).
+8. **Local Docker and root scripts** (`compose.yaml`, `package.json`, `README.md`): Postgres in Docker
+   (`pnpm db:up` / `db:down`, port 54320), `pnpm dev` starts API and web together, and
+   `docker compose up -d --build` runs Postgres, migrations + seed, API and web (the web `local`
+   Dockerfile target builds at container start, once the API is up).
 
 ## Known gaps / next steps
 
-- Docker images and the CI workflow have never run (no Docker daemon in the cloud sandbox, GitHub CI not awaited).
+- The production images (`deploy/`) and the CI workflow have not been run here; the local root `compose.yaml` has.
 - Branch protection (required check `ci`) must be set by the owner in GitHub settings.
 - "Look inside" samples exist for 6 public-domain books only.
 - Star ratings are not shown on listing cards.
