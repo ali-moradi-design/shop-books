@@ -1580,7 +1580,7 @@ export const MORE_BOOKS: {
     price: 44.99,
     stock: 17,
     categories: ['programming', 'software'],
-    coverId: 388950,
+    coverId: 13345163, // full 2nd-edition cover; the 1st-edition scan is cropped
   },
   {
     title: 'Python Crash Course',
