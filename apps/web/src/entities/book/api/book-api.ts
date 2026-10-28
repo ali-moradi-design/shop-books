@@ -9,7 +9,16 @@ const cached = {
 };
 
 export const fetchBooks = (params: BookListParams = {}) =>
-  apiRequest<ApiPaginated<Book>>(`/books${toQuery({ limit: 12, ...params })}`, cached);
+  apiRequest<ApiPaginated<Book>>(`/books${toQuery({ limit: 20, ...params })}`, cached);
+
+/** Every book, page by page (the API allows at most 100 per request): sitemap, static params. */
+export async function fetchAllBooks(): Promise<Book[]> {
+  const first = await fetchBooks({ limit: 100, page: 1 });
+  const rest = await Promise.all(
+    Array.from({ length: first.meta.pages - 1 }, (_, i) => fetchBooks({ limit: 100, page: i + 2 })),
+  );
+  return [first, ...rest].flatMap((r) => r.data);
+}
 
 export const fetchFeatured = async () =>
   (await apiRequest<ApiData<Book[]>>('/books/featured', cached)).data;

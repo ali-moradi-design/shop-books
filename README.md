@@ -17,7 +17,7 @@ What was built, step by step: [docs/session-log.md](docs/session-log.md).
 
 - Warm, classic storefront: wooden shelf of staff picks, events, book covers
   with a paper effect
-- Catalog of 40 books: search by title, author, genre and ISBN, series, filter
+- Catalog of 200 books (covers from Open Library): search by title, author, genre and ISBN, series, filter
   sidebar, book pages with a cached shell and live stock and reviews
   (Partial Prerendering), "look inside" preview of the first pages
 - Cart, checkout with discount codes (`WELCOME10`, `FLAT5`) and a simulated
@@ -54,7 +54,7 @@ pnpm db:up                                # Postgres in Docker on 127.0.0.1:5432
 cp apps/api/.env.example apps/api/.env
 cp apps/web/.env.example apps/web/.env.local
 pnpm migrate                              # create the tables
-pnpm seed                                 # 40 books, demo accounts, discount codes
+pnpm seed                                 # 200 books, demo accounts, discount codes
 pnpm dev                                  # API on :4000 (docs: /api/docs) + web on :3000
 ```
 

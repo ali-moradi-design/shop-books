@@ -2,6 +2,7 @@ import { connectDb } from '../infrastructure/config/db';
 import { repos } from '../infrastructure/composition';
 import { BcryptPasswordHasher } from '../infrastructure/security/password.service';
 import { revalidateWeb } from './revalidate-web';
+import { MORE_BOOKS } from './seed-more-books';
 
 const SECTIONS = [
   'books',
@@ -113,7 +114,19 @@ function coverUrl(isbn: string): string {
   return `https://covers.openlibrary.org/b/isbn/${clean}-L.jpg`;
 }
 
-/** 40 distinct books with real/public ISBNs for Open Library covers */
+/** Cover by Open Library cover id, for books whose ISBN cover is missing or too small. */
+const coverById = (id: number) => `https://covers.openlibrary.org/b/id/${id}-L.jpg`;
+
+/** Better covers for books of the first 40 (same ISBN, so the book ids do not change). */
+const COVER_OVERRIDES: Record<string, number> = {
+  '9780988262591': 12391318,
+  '9780201616224': 15136784,
+  '9780062315007': 15076026,
+  '9780141439846': 12216503,
+  '9781098124038': 12539693,
+};
+
+/** Books shown in Staff picks on the home page. */
 const FEATURED_ISBNS = new Set([
   '9780062316097', // Sapiens
   '9780547928227', // The Hobbit
@@ -123,7 +136,7 @@ const FEATURED_ISBNS = new Set([
   '9781476753836', // Salt Fat Acid Heat
 ]);
 
-const SEED_BOOKS: {
+const FIRST_BOOKS: {
   title: string;
   author: string;
   description: string;
@@ -500,6 +513,18 @@ export type SeedOptions = {
 };
 
 /** Series info and "look inside" samples (public-domain openings only). */
+/** 200 books: the first 40 plus 160 more (seed-more-books.ts). */
+const SEED_BOOKS: {
+  title: string;
+  author: string;
+  description: string;
+  isbn: string;
+  price: number;
+  stock: number;
+  categories: string[];
+  coverId?: number;
+}[] = [...FIRST_BOOKS, ...MORE_BOOKS];
+
 const ENRICH: Record<string, { series?: string; seriesNumber?: number; sample?: string }> = {
   '9780547928227': { series: 'Middle-earth', seriesNumber: 1 },
   '9780547928210': { series: 'Middle-earth', seriesNumber: 2 },
@@ -588,18 +613,23 @@ export async function runSeed(options: SeedOptions = {}): Promise<void> {
   }
 
   const booksToSeed = options.minimalBooks ? SEED_BOOKS.slice(0, 5) : SEED_BOOKS;
-  if (!options.minimalBooks && SEED_BOOKS.length !== 40) {
-    throw new Error(`Expected exactly 40 seed books, got ${SEED_BOOKS.length}`);
+  if (!options.minimalBooks && SEED_BOOKS.length !== 200) {
+    throw new Error(`Expected exactly 200 seed books, got ${SEED_BOOKS.length}`);
+  }
+  if (new Set(SEED_BOOKS.map((b) => b.isbn)).size !== SEED_BOOKS.length) {
+    throw new Error('Seed books must have unique ISBNs (book ids are bk_<isbn>)');
   }
 
   let featuredOrder = 1;
   for (const b of booksToSeed) {
     const featured = FEATURED_ISBNS.has(b.isbn);
+    const { coverId, ...book } = b;
+    const cover = coverId ?? COVER_OVERRIDES[b.isbn];
     await repos.books.upsertByIsbn(b.isbn, {
-      ...b,
+      ...book,
       ...(ENRICH[b.isbn] ?? {}),
       price: Math.round(b.price * 100),
-      coverImageUrl: coverUrl(b.isbn),
+      coverImageUrl: cover ? coverById(cover) : coverUrl(b.isbn),
       currency: 'USD',
       featured,
       featuredOrder: featured ? featuredOrder++ : 0,

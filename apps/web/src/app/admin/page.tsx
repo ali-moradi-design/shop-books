@@ -13,6 +13,7 @@ import { Notice } from '@/shared/ui/Notice';
 import { formatMoney } from '@/shared/lib/money';
 import { firstParam } from '@/shared/lib/query';
 import { RowsSkeleton } from '@/widgets/skeletons';
+import { Pagination } from '@/widgets/catalog';
 
 export const metadata: Metadata = { title: 'Admin', robots: { index: false } };
 
@@ -25,16 +26,17 @@ async function Dashboard({ searchParams }: { searchParams: SP }) {
   await connection();
   const token = await requireToken('/admin');
   if (!isAdmin(await getMe())) notFound();
-  const [summary, books, orders, sp] = await Promise.all([
+  const sp = await searchParams;
+  const page = Math.max(1, Number(firstParam(sp.page)) || 1);
+  const [summary, books, orders] = await Promise.all([
     apiRequest<
       ApiData<{ users: number; books: number; orders: number; revenue: number; lowStock: number }>
     >('/admin/dashboard/summary', { token, cache: 'no-store' }),
-    apiRequest<ApiPaginated<Book>>('/books?limit=100&sort=title&order=asc', {
+    apiRequest<ApiPaginated<Book>>(`/books?limit=50&page=${page}&sort=title&order=asc`, {
       token,
       cache: 'no-store',
     }),
     fetchMyOrders(token),
-    searchParams,
   ]);
   const s = summary.data;
   const stats: [string, string][] = [
@@ -118,6 +120,7 @@ async function Dashboard({ searchParams }: { searchParams: SP }) {
             </tbody>
           </table>
         </div>
+        <Pagination page={books.meta.page} pages={books.meta.pages} params={{}} basePath="/admin" />
       </section>
       <section aria-labelledby="stock-title">
         <div className="mb-4 flex flex-wrap items-center justify-between gap-4">

@@ -20,6 +20,8 @@ const envSchema = z.object({
   ACCESS_TOKEN_TTL: z.string().default('15m'),
   REFRESH_TOKEN_TTL: z.string().default('7d'),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+  // Requests per IP per 15 minutes. The storefront's server renders (and its build) share one IP.
+  RATE_LIMIT_MAX: z.coerce.number().int().positive().optional(),
   CORS_ORIGIN: z.string().default('http://localhost:3000'),
   UPLOAD_DIR: z.string().default('uploads'),
   COOKIE_SECURE: optionalBool,

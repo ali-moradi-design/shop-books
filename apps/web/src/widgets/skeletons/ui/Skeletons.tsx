@@ -57,7 +57,7 @@ export function CatalogSkeleton() {
         <Title />
         <Skeleton className="mb-8 mt-2 h-4 w-20" />
         <div className="grid grid-cols-2 gap-x-7 gap-y-10 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-          {Array.from({ length: 8 }, (_, i) => (
+          {Array.from({ length: 10 }, (_, i) => (
             <BookCardSkeleton key={i} />
           ))}
         </div>
