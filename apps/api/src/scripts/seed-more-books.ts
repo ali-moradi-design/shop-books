@@ -1610,6 +1610,6 @@ export const MORE_BOOKS: {
     price: 17.99,
     stock: 6,
     categories: ['programming', 'history'],
-    coverId: 106396,
+    coverId: 15132963, // full 25th-anniversary cover; the 2001 scan is cropped
   },
 ];

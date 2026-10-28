@@ -7,7 +7,11 @@ export function BookInfo({ book }: { book: Book }) {
   return (
     <>
       <div className="max-w-[420px]">
-        <BookCover book={book} priority className="shadow-[0_30px_50px_-20px_rgb(0_0_0/0.6)]" />
+        <BookCover
+          book={book}
+          priority
+          className="shadow-[0_30px_50px_-20px_rgb(0_0_0/0.6)] data-[fit=contain]:items-start"
+        />
       </div>
       <div>
         {book.categories && book.categories.length > 0 && (

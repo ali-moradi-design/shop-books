@@ -1,7 +1,19 @@
+'use client';
+
+import { useCallback, useState } from 'react';
 import type { Book } from '../model/types';
 import { cn } from '@/shared/lib/cn';
 
-/** Cover with the hinge overlay and soft shadow (`.book-cover` in globals.css). */
+type CoverState = 'loading' | 'loaded' | 'error';
+
+/** Covers wider than this (width / height) would lose their edges in the 2:3 frame. */
+const WIDE_COVER = 0.72;
+
+/**
+ * Cover with the hinge overlay and soft shadow (`.book-cover` in globals.css).
+ * Shows a pulsing placeholder until the image arrives, then fades it in; a broken
+ * image falls back to the title card. Wide covers keep their full shape, bottom-aligned.
+ */
 export function BookCover({
   book,
   className,
@@ -11,21 +23,50 @@ export function BookCover({
   className?: string;
   priority?: boolean;
 }) {
-  return (
-    <span className={cn('book-cover', className)}>
-      {book.coverImageUrl ? (
-        // Covers come from third-party hosts; the optimizer adds nothing for them.
-        <img
-          src={book.coverImageUrl}
-          alt={`Cover of ${book.title}`}
-          loading={priority ? 'eager' : 'lazy'}
-          decoding="async"
-        />
-      ) : (
+  const [state, setState] = useState<CoverState>('loading');
+  const [wide, setWide] = useState(false);
+
+  const settle = useCallback((img: HTMLImageElement) => {
+    if (img.naturalWidth === 0) return setState('error');
+    setWide(img.naturalWidth / img.naturalHeight > WIDE_COVER);
+    setState('loaded');
+  }, []);
+
+  // The image can finish loading before hydration, when onLoad has already fired.
+  const imgRef = useCallback(
+    (img: HTMLImageElement | null) => {
+      if (img?.complete) settle(img);
+    },
+    [settle],
+  );
+
+  if (!book.coverImageUrl || state === 'error') {
+    return (
+      <span className={cn('book-cover', className)}>
         <span className="flex aspect-[2/3] items-center justify-center bg-forest-900 p-3 text-center font-serif text-white">
           {book.title}
         </span>
-      )}
+      </span>
+    );
+  }
+
+  return (
+    <span
+      className={cn('book-cover', className)}
+      data-state={state}
+      data-fit={wide ? 'contain' : undefined}
+    >
+      {/* Covers come from third-party hosts; the optimizer adds nothing for them. */}
+      <img
+        ref={imgRef}
+        src={book.coverImageUrl}
+        alt={`Cover of ${book.title}`}
+        loading={priority ? 'eager' : 'lazy'}
+        fetchPriority={priority ? 'high' : undefined}
+        decoding="async"
+        onLoad={(e) => settle(e.currentTarget)}
+        onError={() => setState('error')}
+      />
     </span>
   );
 }
