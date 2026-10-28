@@ -1,10 +1,10 @@
 import type { MetadataRoute } from 'next';
-import { fetchBooks } from '@/entities/book';
+import { fetchAllBooks } from '@/entities/book';
 
 const base = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const { data } = await fetchBooks({ limit: 100 }).catch(() => ({ data: [] }));
+  const data = await fetchAllBooks().catch(() => []);
   return [
     { url: `${base}/`, changeFrequency: 'daily', priority: 1 },
     { url: `${base}/books`, changeFrequency: 'daily', priority: 0.9 },

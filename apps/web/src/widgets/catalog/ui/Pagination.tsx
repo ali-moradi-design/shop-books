@@ -6,13 +6,15 @@ export function Pagination({
   page,
   pages,
   params,
+  basePath = '/books',
 }: {
   page: number;
   pages: number;
   params: Record<string, string | undefined>;
+  basePath?: string;
 }) {
   if (pages <= 1) return null;
-  const href = (p: number) => `/books${toQuery({ ...params, page: p > 1 ? p : undefined })}`;
+  const href = (p: number) => `${basePath}${toQuery({ ...params, page: p > 1 ? p : undefined })}`;
   const items = Array.from({ length: pages }, (_, i) => i + 1).filter(
     (p) => p === 1 || p === pages || Math.abs(p - page) <= 1,
   );

@@ -3,7 +3,7 @@ import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { cacheLife } from 'next/cache';
-import { fetchBook, fetchBooks } from '@/entities/book';
+import { fetchAllBooks, fetchBook } from '@/entities/book';
 import { BookInfo, BuyBox, LookInside, Related, Reviews } from '@/widgets/book-detail';
 import { firstParam } from '@/shared/lib/query';
 import { formatMoney } from '@/shared/lib/money';
@@ -12,8 +12,7 @@ import { ReviewsSkeleton } from '@/widgets/skeletons';
 type Params = Promise<{ id: string }>;
 
 export async function generateStaticParams() {
-  const { data } = await fetchBooks({ limit: 100 });
-  return data.map((b) => ({ id: b.id }));
+  return (await fetchAllBooks()).map((b) => ({ id: b.id }));
 }
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
