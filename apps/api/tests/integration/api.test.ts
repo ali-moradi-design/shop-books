@@ -159,6 +159,18 @@ describe('Bookstore API (integration)', () => {
       );
     });
 
+    it('parses boolean filters from the query string (featured, inStock)', async () => {
+      // "true"/"false" must reach the repository as booleans, not strings (500 before)
+      const featured = await ctx.request.get('/api/v1/books?featured=true&limit=100').expect(200);
+      expect(featured.body.data.length).toBeGreaterThan(0);
+      expect(featured.body.data.every((b: { featured: boolean }) => b.featured)).toBe(true);
+
+      const all = await ctx.request.get('/api/v1/books?limit=100').expect(200);
+      const inStock = await ctx.request.get('/api/v1/books?inStock=true&limit=100').expect(200);
+      const outOfStock = await ctx.request.get('/api/v1/books?inStock=false&limit=100').expect(200);
+      expect(inStock.body.meta.total + outOfStock.body.meta.total).toBe(all.body.meta.total);
+    });
+
     it('searches by ISBN and series, filters by author, exposes facets and samples', async () => {
       const byIsbn = await ctx.request.get('/api/v1/books?q=978-0-14-143951-8').expect(200);
       expect(byIsbn.body.data.map((b: { title: string }) => b.title)).toContain(
