@@ -106,4 +106,4 @@ suite; the `ci` job is the single required check.
 - The browser talks only to the storefront: server actions call the API, and the
   API tokens live in the storefront's own httpOnly cookies (`sb_access`, `sb_refresh`).
   Keep the API port private.
-- Nightly reset: run `reset-demo` from cron; it removes visitor data and re-seeds.
+- Nightly reset: run `reset-demo` from cron (command in deploy/README.md); it removes visitor data and re-seeds.

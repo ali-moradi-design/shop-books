@@ -14,9 +14,12 @@ RUN pnpm install --frozen-lockfile --prod=false --filter @shop-books/api...
 
 COPY apps/api apps/api
 WORKDIR /repo/apps/api
-RUN pnpm build && mkdir -p uploads/books
+RUN pnpm build && mkdir -p uploads/books && chown -R node:node uploads
+# run as the image's unprivileged user; only uploads/ (a volume in production) is writable
+USER node
 
 EXPOSE 4000
 HEALTHCHECK --interval=15s --timeout=5s --start-period=40s --retries=5 \
   CMD node -e "fetch('http://127.0.0.1:4000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
-CMD ["sh", "-c", "pnpm exec prisma migrate deploy && node dist/server.js"]
+# no pnpm at start: it wants a writable home, and production runs with a read-only disk
+CMD ["sh", "-c", "node_modules/.bin/prisma migrate deploy && exec node dist/server.js"]
