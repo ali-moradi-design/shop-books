@@ -41,7 +41,7 @@ services:
       # Prisma must not phone home or write caches on a read-only disk
       CHECKPOINT_DISABLE: "1"
     volumes:
-      - uploads:/repo/apps/api/uploads
+      - uploads:/app/uploads
     networks: [backend, frontend]
     depends_on:
       db:
