@@ -34,7 +34,7 @@ services:
   seed:
     build: { context: ., dockerfile: apps/api/Dockerfile }
     image: shop-books-api:local
-    command: ["sh", "-c", "pnpm exec prisma migrate deploy && pnpm seed"]
+    command: ["sh", "-c", "node_modules/.bin/prisma migrate deploy && node dist/scripts/seed.js"]
     environment: *api-env
     depends_on:
       postgres: { condition: service_healthy }
@@ -47,7 +47,7 @@ services:
     ports:
       - "127.0.0.1:4000:4000"
     volumes:
-      - uploads:/repo/apps/api/uploads
+      - uploads:/app/uploads
     depends_on:
       seed: { condition: service_completed_successfully }
     restart: unless-stopped
