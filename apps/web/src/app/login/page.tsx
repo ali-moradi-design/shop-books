@@ -18,7 +18,8 @@ async function Form({
 }) {
   const sp = await searchParams;
   const next = safeNext(firstParam(sp.next));
-  const msg = firstParam(sp.msg);
+  // fixed messages only: text from the URL could be written by anyone
+  const msg = sp.reset ? 'Your password is set. Sign in with it now.' : undefined;
   return (
     <>
       {msg && (

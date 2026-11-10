@@ -52,7 +52,7 @@ async function checkoutUrl(token: string, orderId: string): Promise<string> {
     );
     return res.data.url;
   } catch {
-    return `/orders/${orderId}?error=${encodeURIComponent('Could not open the payment page. Try again.')}`;
+    return `/orders/${orderId}?payment=unavailable`;
   }
 }
 
