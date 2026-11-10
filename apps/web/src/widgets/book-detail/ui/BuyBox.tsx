@@ -15,14 +15,14 @@ import { NotifyMe } from '@/features/stock-alerts/ui/NotifyMe';
 /** Dynamic hole (PPR): live price and stock, cart and reading-list state. */
 export async function BuyBox({ bookId, error }: { bookId: string; error?: string }) {
   await connection();
-  const [book, token, variant] = await Promise.all([
+  // the token is a cookie (no request), so the reading list loads alongside the book
+  const token = await getToken();
+  const [book, favorites, variant] = await Promise.all([
     fetchBookLive(bookId),
-    getToken(),
+    token ? fetchFavorites(token).catch(() => []) : Promise.resolve([]),
     getVariant('buybox-benefits'),
   ]);
-  const saved = token
-    ? (await fetchFavorites(token).catch(() => [])).some((f) => f.bookId === bookId)
-    : false;
+  const saved = favorites.some((f) => f.bookId === bookId);
   const soldOut = book.stock === 0;
   return (
     <aside
