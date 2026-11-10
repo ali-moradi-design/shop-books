@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 import { apiRequest, ApiError } from '@/shared/api';
+import { visitorIp } from '@/shared/lib/visitor-ip';
 import { clearSession, safeNext, setSession, type TokenPair } from '@/shared/lib/auth';
 
 export interface FormState {
@@ -14,6 +15,7 @@ export async function login(_prev: FormState, form: FormData): Promise<FormState
   let tokens: TokenPair;
   try {
     tokens = await apiRequest<TokenPair>('/auth/login', {
+      ip: await visitorIp(),
       method: 'POST',
       json: { email: str(form, 'email'), password: String(form.get('password') ?? '') },
     });
@@ -33,6 +35,7 @@ export async function register(_prev: FormState, form: FormData): Promise<FormSt
   let tokens: TokenPair;
   try {
     tokens = await apiRequest<TokenPair>('/auth/register', {
+      ip: await visitorIp(),
       method: 'POST',
       json: {
         name: str(form, 'name'),

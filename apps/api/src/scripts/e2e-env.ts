@@ -15,6 +15,8 @@ Object.assign(process.env, {
   STOREFRONT_URL: `http://localhost:${process.env.E2E_WEB_PORT ?? 3100}`,
   STRIPE_SECRET_KEY: '',
   SMTP_URL: '',
+  // the storefront forwards the visitor's address on sign-in
+  TRUST_PROXY: '1',
 });
 
 export { port };
