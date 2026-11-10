@@ -34,6 +34,9 @@ services:
       ACCESS_TOKEN_TTL: 12h
       REFRESH_TOKEN_TTL: 7d
       CORS_ORIGIN: https://shop-books.ali-moradi-develop.com
+      # Stripe Checkout (and its simulator, used while STRIPE_SECRET_KEY is unset) and the
+      # links in emails send customers back here
+      STOREFRONT_URL: https://shop-books.ali-moradi-develop.com
       COOKIE_SECURE: "true"
       # seed and the nightly demo reset tell the storefront to drop its cached catalog
       WEB_REVALIDATE_URL: http://web:3000/hooks/revalidate
