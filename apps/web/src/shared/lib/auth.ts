@@ -60,5 +60,8 @@ export const isAdmin = (me: Me | null): boolean => !!me?.roles.some((r) => r.nam
 
 /** Only allow same-site relative redirects. */
 export function safeNext(next: string | undefined): string {
-  return next && next.startsWith('/') && !next.startsWith('//') ? next : '/';
+  // no //host or /\host: browsers read both as another site
+  return next && next.startsWith('/') && !next.startsWith('//') && !next.includes('\\')
+    ? next
+    : '/';
 }

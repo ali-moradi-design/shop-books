@@ -11,6 +11,10 @@ Object.assign(process.env, {
   ACCESS_TOKEN_TTL: '12h',
   CORS_ORIGIN: '*',
   COOKIE_SECURE: 'false',
+  // Stripe Checkout (simulated) sends the customer back to the e2e storefront
+  STOREFRONT_URL: `http://localhost:${process.env.E2E_WEB_PORT ?? 3100}`,
+  STRIPE_SECRET_KEY: '',
+  SMTP_URL: '',
 });
 
 export { port };

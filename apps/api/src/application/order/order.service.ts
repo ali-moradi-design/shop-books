@@ -12,7 +12,19 @@ import {
 import { DomainError } from '../../domain/shared/DomainError';
 import { assertSufficientStock } from '../../domain/book/rules/stock';
 import { computeSubtotal, computeOrderTotal } from '../../domain/cart/rules/cart.totals';
-import { PayOrderUseCase } from './use-cases/pay-order';
+import { PayOrderUseCase, type PaymentReceipt } from './use-cases/pay-order';
+import type { Shipment } from '../../domain/order/order.entity';
+import {
+  domainEvents,
+  orderCancelledEvent,
+  orderShippedEvent,
+  stockRestoredEvent,
+} from '../../domain/shared/events';
+
+/** Refunds a payment through the provider; returns the refund id. */
+export interface Refunder {
+  refund(paymentIntentId: string, amount: number): Promise<string>;
+}
 
 export class OrderService {
   private readonly payOrder: PayOrderUseCase;
@@ -23,6 +35,7 @@ export class OrderService {
     private readonly discounts?: DiscountService,
     uow?: IUnitOfWork,
     notifications?: INotificationPort,
+    private refunds?: Refunder,
   ) {
     this.payOrder = new PayOrderUseCase(orders, books, uow, notifications);
   }
@@ -92,8 +105,22 @@ export class OrderService {
     return order;
   }
 
-  pay(orderId: string, userId: string, isStaff: boolean): Promise<Order> {
-    return this.payOrder.execute(orderId, userId, isStaff);
+  /** The payment provider used for refunds; set once payments are wired. */
+  useRefunder(refunds: Refunder): void {
+    this.refunds = refunds;
+  }
+
+  /** Staff record a payment taken outside the shop (bank transfer, in store). */
+  recordPayment(orderId: string, staffId: string): Promise<Order> {
+    return this.payOrder.execute(orderId, {
+      method: 'manual',
+      transactionId: `manual_${orderId}`,
+      note: `Payment recorded by staff (${staffId})`,
+    });
+  }
+
+  confirmPayment(orderId: string, receipt: PaymentReceipt): Promise<Order> {
+    return this.payOrder.execute(orderId, receipt);
   }
 
   async list(userId: string, canReadAll: boolean): Promise<Order[]> {
@@ -109,7 +136,12 @@ export class OrderService {
     return order;
   }
 
-  async updateStatus(orderId: string, nextStatus: OrderStatus, note?: string): Promise<Order> {
+  async updateStatus(
+    orderId: string,
+    nextStatus: OrderStatus,
+    note?: string,
+    shipment?: Pick<Shipment, 'carrier' | 'trackingNumber'>,
+  ): Promise<Order> {
     const order = await this.orders.findById(orderId);
     if (!order) throw new DomainError('Order not found', 'NOT_FOUND');
 
@@ -119,14 +151,62 @@ export class OrderService {
       throw new DomainError('Cannot cancel order in current status', 'VALIDATION');
     }
 
+    let refunded = false;
     if (nextStatus === 'cancelled' && shouldRestockOnCancel(order.status)) {
-      for (const item of order.items) {
-        await this.books.incrementStock(item.book, item.quantity);
+      // money first: if the refund fails nothing has changed and staff can retry
+      if (
+        order.payment.method === 'stripe' &&
+        order.payment.transactionId &&
+        this.refunds &&
+        !order.refundId
+      ) {
+        order.refundId = await this.refunds.refund(order.payment.transactionId, order.totalAmount);
+        refunded = true;
       }
+      for (const item of order.items) {
+        const wasOut = await this.books.incrementStock(item.book, item.quantity);
+        if (wasOut) await domainEvents.publish(stockRestoredEvent({ bookId: item.book }));
+      }
+    }
+    if (nextStatus === 'shipped' && shipment) {
+      order.shipment = {
+        ...shipment,
+        trackingNumber: shipment.trackingNumber.trim(),
+        shippedAt: new Date(),
+      };
     }
 
     order.status = nextStatus;
-    order.statusHistory.push({ status: nextStatus, at: new Date(), note });
-    return this.orders.save(order);
+    const autoNote = refunded ? `Refunded ${order.refundId}` : undefined;
+    order.statusHistory.push({
+      status: nextStatus,
+      at: new Date(),
+      note: [note, autoNote].filter(Boolean).join(' · ') || undefined,
+    });
+    const saved = await this.orders.save(order);
+
+    if (nextStatus === 'shipped')
+      await domainEvents.publish(orderShippedEvent({ orderId: saved.id, userId: saved.user }));
+    if (nextStatus === 'cancelled')
+      await domainEvents.publish(
+        orderCancelledEvent({ orderId: saved.id, userId: saved.user, refunded }),
+      );
+    return saved;
+  }
+
+  /** A customer cancels their own order before it ships. */
+  async cancelOwn(orderId: string, userId: string, reason?: string): Promise<Order> {
+    const order = await this.getById(orderId, userId, false);
+    if (!canCancel(order.status)) {
+      throw new DomainError(
+        'This order has shipped and can no longer be cancelled. You can request a return instead.',
+        'VALIDATION',
+      );
+    }
+    return this.updateStatus(
+      order.id,
+      'cancelled',
+      reason ? `Cancelled by customer: ${reason}` : 'Cancelled by customer',
+    );
   }
 }

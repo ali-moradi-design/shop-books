@@ -4,7 +4,9 @@ import { connection } from 'next/server';
 import { redirect } from 'next/navigation';
 import { requireToken } from '@/shared/lib/auth';
 import { cartSubtotal, fetchCartLines } from '@/features/cart/api';
-import { CheckoutForm } from '@/features/checkout/ui/CheckoutForm';
+import { CheckoutForm, type SavedAddress } from '@/features/checkout/ui/CheckoutForm';
+import { apiRequest } from '@/shared/api';
+import type { ApiData } from '@/shared/api';
 import { formatMoney } from '@/shared/lib/money';
 import { RowsSkeleton } from '@/widgets/skeletons';
 
@@ -13,11 +15,21 @@ export const metadata: Metadata = { title: 'Checkout', robots: { index: false } 
 async function Checkout() {
   await connection();
   const token = await requireToken('/checkout');
-  const lines = await fetchCartLines(token);
+  const [lines, account] = await Promise.all([
+    fetchCartLines(token),
+    apiRequest<ApiData<{ addresses: (SavedAddress & { isDefault: boolean })[] }>>('/account', {
+      token,
+      cache: 'no-store',
+    })
+      .then((r) => r.data)
+      .catch(() => null),
+  ]);
   if (lines.length === 0) redirect('/cart');
+  const saved = account?.addresses ?? [];
+  const preferred = saved.find((a) => a.isDefault) ?? saved[0];
   return (
     <div className="grid gap-12 lg:grid-cols-[1fr_380px]">
-      <CheckoutForm />
+      <CheckoutForm address={preferred} hasSaved={saved.length > 0} />
       <aside
         aria-label="Order summary"
         className="self-start rounded-lg border-t-[5px] border-forest-900 bg-white p-8"

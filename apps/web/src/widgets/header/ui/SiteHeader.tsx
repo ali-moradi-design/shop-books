@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { CartBadge } from '@/features/cart/ui/CartBadge';
 import { Logo } from '@/shared/ui/Logo';
 import { UserMenu } from './UserMenu';
+import { SearchBox } from './SearchBox';
 
 const nav = [
   { href: '/', label: 'Home' },
@@ -20,28 +21,7 @@ export function SiteHeader() {
           <Link href="/" aria-label="Bay Book Company, home" className="text-white">
             <Logo />
           </Link>
-          <form
-            action="/books"
-            role="search"
-            className="flex min-w-[260px] max-w-2xl flex-1 overflow-hidden rounded-sm bg-white text-ink"
-          >
-            <label htmlFor="site-search" className="sr-only">
-              Search by title, author, genre or ISBN
-            </label>
-            <input
-              id="site-search"
-              name="q"
-              type="search"
-              placeholder="Search by title, author, genre or ISBN"
-              className="min-w-0 flex-1 px-4 py-3 font-serif text-[15px] focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-forest-500"
-            />
-            <button
-              type="submit"
-              className="bg-mint-300 px-5 font-sans text-sm font-semibold text-forest-900 hover:bg-gold-300"
-            >
-              Search
-            </button>
-          </form>
+          <SearchBox />
           <div className="ml-auto flex flex-wrap items-center gap-2 font-sans text-sm sm:gap-3">
             <Suspense fallback={<span className="px-3 py-1.5">…</span>}>
               <UserMenu />

@@ -46,7 +46,9 @@ model User {
   id           String    @id @default(cuid())
   name         String
   email        String    @unique
-  passwordHash String
+  /// empty for guest-checkout accounts until they set a password from the emailed link
+  passwordHash String?
+  guest        Boolean   @default(false)
   isActive     Boolean   @default(true)
   deletedAt    DateTime?
   createdAt    DateTime  @default(now())
@@ -59,6 +61,9 @@ model User {
   cart          Cart?
   favorites     Favorite[]
   issueReports  IssueReport[]
+  addresses     Address[]
+  resetTokens   PasswordResetToken[]
+  returns       ReturnRequest[]
 }
 
 model Role {
@@ -171,12 +176,19 @@ model Order {
   shippingState      String?
   shippingPostalCode String
   shippingCountry    String
+  /// the open Stripe Checkout Session, reused while the customer retries
+  checkoutSessionId  String?       @unique
+  refundId           String?
+  shipCarrier        String?
+  shipTracking       String?
+  shippedAt          DateTime?
   statusHistory      Json
   deletedAt          DateTime?
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
 
-  items OrderItem[]
+  items   OrderItem[]
+  returns ReturnRequest[]
 
   @@index([userId])
   @@index([status])
@@ -280,4 +292,124 @@ model IssueReport {
 
   @@index([reporterId])
   @@index([status])
+}
+
+model Address {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label      String?
+  fullName   String
+  line1      String
+  line2      String?
+  city       String
+  state      String?
+  postalCode String
+  country    String
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+}
+
+/// One-time password reset link; only the hash is stored
+model PasswordResetToken {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+}
+
+/// Every email the shop sent, or kept here when no SMTP server is set
+model EmailMessage {
+  id        String   @id @default(cuid())
+  to        String
+  subject   String
+  text      String
+  html      String
+  template  String
+  status    String
+  error     String?
+  createdAt DateTime @default(now())
+
+  @@index([to, createdAt])
+  @@index([createdAt])
+}
+
+model Subscriber {
+  id             String    @id @default(cuid())
+  email          String    @unique
+  token          String    @unique
+  source         String    @default("footer")
+  unsubscribedAt DateTime?
+  createdAt      DateTime  @default(now())
+
+  @@index([unsubscribedAt, createdAt])
+}
+
+/// "Email me when this book is back in stock"
+model StockAlert {
+  id         String    @id @default(cuid())
+  bookId     String
+  email      String
+  notifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([bookId, notifiedAt])
+  @@index([email])
+}
+
+model ReturnRequest {
+  id           String   @id @default(cuid())
+  orderId      String
+  order        Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// [{ bookId, title, quantity, price }]
+  items        Json
+  reason       String
+  comment      String?
+  status       String   @default("requested")
+  refundAmount Int      @default(0)
+  refundId     String?
+  history      Json
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([orderId])
+  @@index([userId])
+  @@index([status, createdAt])
+}
+
+/// Successful writes by staff, for the admin activity log
+model AuditEntry {
+  id         String   @id @default(cuid())
+  actorId    String
+  actorEmail String
+  method     String
+  path       String
+  action     String
+  status     Int
+  at         DateTime @default(now())
+
+  @@index([at])
+  @@index([actorId])
+}
+
+/// A/B test events: one row per visitor, experiment and event type
+model ExperimentEvent {
+  id         String   @id @default(cuid())
+  experiment String
+  variant    String
+  visitor    String
+  type       String
+  at         DateTime @default(now())
+
+  @@unique([experiment, visitor, type])
+  @@index([experiment, variant, type])
 }

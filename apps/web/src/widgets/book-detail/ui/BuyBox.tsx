@@ -8,11 +8,18 @@ import { fetchFavorites } from '@/features/favorites/api';
 import { Button } from '@/shared/ui/Button';
 import { Notice } from '@/shared/ui/Notice';
 import { formatMoney } from '@/shared/lib/money';
+import { getVariant } from '@/shared/lib/ab/server';
+import { Exposure } from '@/shared/lib/ab/Exposure';
+import { NotifyMe } from '@/features/stock-alerts/ui/NotifyMe';
 
 /** Dynamic hole (PPR): live price and stock, cart and reading-list state. */
 export async function BuyBox({ bookId, error }: { bookId: string; error?: string }) {
   await connection();
-  const [book, token] = await Promise.all([fetchBookLive(bookId), getToken()]);
+  const [book, token, variant] = await Promise.all([
+    fetchBookLive(bookId),
+    getToken(),
+    getVariant('buybox-benefits'),
+  ]);
   const saved = token
     ? (await fetchFavorites(token).catch(() => [])).some((f) => f.bookId === bookId)
     : false;
@@ -39,6 +46,18 @@ export async function BuyBox({ bookId, error }: { bookId: string; error?: string
             : `In stock — ${book.stock} copies`}
       </p>
       {error && <Notice tone="error">{error}</Notice>}
+      {soldOut && <NotifyMe bookId={bookId} />}
+      <Exposure experiment="buybox-benefits" />
+      {variant === 'benefits' && !soldOut && (
+        <ul
+          aria-label="With every order"
+          className="mb-3 grid grid-cols-3 gap-2 text-center font-sans text-xs text-forest-900"
+        >
+          <li className="rounded-md bg-forest-50 px-2 py-2">Free shipping over $40</li>
+          <li className="rounded-md bg-forest-50 px-2 py-2">30-day returns</li>
+          <li className="rounded-md bg-forest-50 px-2 py-2">Ships in 1–2 days</li>
+        </ul>
+      )}
       <form action={addToCart.bind(null, bookId)} className="mt-3 flex gap-3">
         <label className="sr-only" htmlFor="qty">
           Quantity

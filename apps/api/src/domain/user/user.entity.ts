@@ -3,6 +3,8 @@ export interface User {
   name: string;
   email: string;
   passwordHash?: string;
+  /** Made at guest checkout; a normal account once a password is set. */
+  guest?: boolean;
   roles: string[];
   isActive: boolean;
   deletedAt?: Date | null;

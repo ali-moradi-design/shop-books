@@ -1,6 +1,7 @@
 import type { Book } from '../../../domain/book/book.entity';
 import type { User } from '../../../domain/user/user.entity';
 import type {
+  Carrier,
   Order,
   OrderItem,
   OrderStatus,
@@ -71,7 +72,8 @@ export function mapUser(
     id: row.id,
     name: row.name,
     email: row.email,
-    passwordHash: row.passwordHash,
+    passwordHash: row.passwordHash ?? undefined,
+    guest: row.guest,
     roles: roleIds,
     isActive: row.isActive,
     deletedAt: row.deletedAt,
@@ -149,7 +151,10 @@ export function mapOrder(row: OrderWithItems): Order {
     ? row.statusHistory
     : []) as unknown as StatusHistory[];
   const payment: Payment = {
-    method: 'fake',
+    method: (['fake', 'stripe', 'manual'].includes(row.paymentMethod)
+      ? row.paymentMethod
+      : 'fake') as Payment['method'],
+    checkoutSessionId: row.checkoutSessionId ?? undefined,
     status: row.paymentStatus,
     paidAt: row.paidAt ?? undefined,
     transactionId: row.transactionId ?? undefined,
@@ -174,6 +179,15 @@ export function mapOrder(row: OrderWithItems): Order {
     status: row.status as OrderStatus,
     payment,
     shippingAddress,
+    shipment:
+      row.shipCarrier && row.shipTracking && row.shippedAt
+        ? {
+            carrier: row.shipCarrier as Carrier,
+            trackingNumber: row.shipTracking,
+            shippedAt: row.shippedAt,
+          }
+        : undefined,
+    refundId: row.refundId ?? undefined,
     statusHistory: history.map((h) => ({
       status: h.status,
       at: new Date(h.at),

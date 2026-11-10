@@ -10,6 +10,7 @@ import {
   createOrderSchema,
   updateStatusSchema,
   idParamSchema,
+  cancelOrderSchema,
 } from '../validators/orders.validation';
 
 const router = Router();
@@ -29,8 +30,21 @@ router.get(
   ctrl.getById,
 );
 router.post(
+  '/:id/checkout',
+  requirePermission('orders:create'),
+  validate({ params: idParamSchema }),
+  ctrl.startCheckout,
+);
+router.post(
+  '/:id/cancel',
+  requireAnyPermission('orders:read-own', 'orders:read'),
+  validate({ params: idParamSchema, body: cancelOrderSchema }),
+  ctrl.cancelOwn,
+);
+// staff only: customers pay through Stripe, and only Stripe's webhook marks those orders paid
+router.post(
   '/:id/pay',
-  requireAnyPermission('orders:create', 'orders:update-status'),
+  requirePermission('orders:update-status'),
   validate({ params: idParamSchema }),
   ctrl.pay,
 );

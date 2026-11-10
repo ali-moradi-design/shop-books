@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 
 type SP = Promise<Record<string, string | string[] | undefined>>;
 
-/** Cached static shell: cover, text, "look inside" and JSON-LD. Dynamic parts arrive as slots. */
+/** Cached static shell: cover, text and "look inside". Dynamic parts arrive as slots. */
 async function Shell({
   id,
   buy,
@@ -50,40 +50,8 @@ async function Shell({
   cacheLife('hours');
   const book = await fetchBook(id).catch(() => null);
   if (!book) return null;
-  const jsonLd = [
-    {
-      '@context': 'https://schema.org',
-      '@type': 'Product',
-      name: book.title,
-      image: book.coverImageUrl,
-      description: book.description,
-      isbn: book.isbn,
-      brand: { '@type': 'Brand', name: book.author },
-      offers: {
-        '@type': 'Offer',
-        priceCurrency: book.currency,
-        price: (book.price / 100).toFixed(2),
-        availability:
-          book.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-        url: `/books/${book.id}`,
-      },
-    },
-    {
-      '@context': 'https://schema.org',
-      '@type': 'BreadcrumbList',
-      itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Home', item: '/' },
-        { '@type': 'ListItem', position: 2, name: 'Books', item: '/books' },
-        { '@type': 'ListItem', position: 3, name: book.title },
-      ],
-    },
-  ];
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }}
-      />
       <p className="font-sans text-sm text-ink-muted">
         <Link href="/">Home</Link> › <Link href="/books">Books</Link> ›{' '}
         <span className="font-semibold text-forest-900">{book.title}</span>

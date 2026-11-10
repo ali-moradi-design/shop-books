@@ -10,6 +10,10 @@ import { errorHandler, notFoundHandler } from './interfaces/http/middleware/erro
 import { requestIdMiddleware } from './interfaces/http/middleware/requestId';
 import { globalRateLimiter } from './interfaces/http/middleware/security/rate-limit';
 import apiV1Routes from './interfaces/http/v1/routes';
+import { registerPaymentWebhook } from './interfaces/http/v1/routes/payments.routes';
+import { registerEmailNotifications } from './infrastructure/notifications/email-notifications';
+
+registerEmailNotifications();
 
 const app = express();
 
@@ -21,6 +25,8 @@ app.use(
     credentials: true,
   }),
 );
+// before express.json: the Stripe signature covers the raw body
+registerPaymentWebhook(app);
 app.use(express.json({ limit: '1mb' }));
 app.use(cookieParser());
 if (env.NODE_ENV !== 'test') {
@@ -30,6 +36,15 @@ if (env.NODE_ENV !== 'test') {
 if (env.NODE_ENV !== 'test') {
   app.use(globalRateLimiter);
 }
+
+// the API is never meant to show up in search results
+app.use((_req, res, next) => {
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive');
+  next();
+});
+app.get('/robots.txt', (_req, res) => {
+  res.type('text/plain').send('User-agent: *\nDisallow: /\n');
+});
 
 app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });

@@ -12,6 +12,7 @@ const DEMO_EMAILS = ['admin@bookstore.local', 'customer@bookstore.local'];
  */
 export async function resetDemoData(): Promise<void> {
   await prisma.$transaction([
+    prisma.returnRequest.deleteMany(),
     prisma.orderItem.deleteMany(),
     prisma.order.deleteMany(),
     prisma.cartItem.deleteMany(),
@@ -20,6 +21,12 @@ export async function resetDemoData(): Promise<void> {
     prisma.review.deleteMany(),
     prisma.issueReport.deleteMany(),
     prisma.refreshToken.deleteMany(),
+    prisma.passwordResetToken.deleteMany(),
+    prisma.address.deleteMany(),
+    prisma.emailMessage.deleteMany(),
+    prisma.subscriber.deleteMany(),
+    prisma.stockAlert.deleteMany(),
+    prisma.auditEntry.deleteMany(),
     prisma.userRole.deleteMany({ where: { user: { email: { notIn: DEMO_EMAILS } } } }),
     prisma.user.deleteMany({ where: { email: { notIn: DEMO_EMAILS } } }),
     prisma.discount.updateMany({ data: { usedCount: 0 } }),

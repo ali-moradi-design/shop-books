@@ -28,8 +28,11 @@ export async function UserMenu() {
           Admin
         </Link>
       )}
-      <Link href="/orders" className={link} title={`Signed in as ${me.email}`}>
+      <Link href="/orders" className={link}>
         My orders
+      </Link>
+      <Link href="/account" className={link} title={`Signed in as ${me.email}`}>
+        Account
       </Link>
       <form action={logout}>
         <button type="submit" className={link}>

@@ -12,6 +12,11 @@ const optionalBool = z
     return ['true', '1', 'yes'].includes(v.trim().toLowerCase());
   });
 
+const optionalString = z
+  .string()
+  .optional()
+  .transform((v) => v?.trim() || undefined);
+
 const envSchema = z.object({
   PORT: z.coerce.number().default(4000),
   DATABASE_URL: z.string().min(1),
@@ -33,6 +38,17 @@ const envSchema = z.object({
       const trimmed = v?.trim();
       return trimmed ? trimmed : undefined;
     }),
+  // Payments: Stripe Checkout in test mode. With no key the API simulates Stripe,
+  // including signed webhooks, so the whole flow works without an account.
+  STOREFRONT_URL: z.string().url().default('http://localhost:3000'),
+  STRIPE_SECRET_KEY: optionalString,
+  STRIPE_WEBHOOK_SECRET: optionalString,
+  PAYMENT_CURRENCY: z.string().length(3).toLowerCase().default('usd'),
+  // Email: without SMTP_URL messages are kept in the outbox (admin → Emails) instead of sent.
+  SMTP_URL: optionalString,
+  MAIL_FROM: z.string().default('Bay Book Company <shop@baybooks.local>'),
+  ADMIN_ALERT_EMAIL: optionalString,
+  SENTRY_DSN: optionalString,
 });
 
 const parsed = envSchema.safeParse(process.env);
@@ -43,6 +59,16 @@ if (!parsed.success) {
 }
 
 const data = parsed.data;
+
+// This shop only takes test payments: a live key would charge real cards.
+if (data.STRIPE_SECRET_KEY && !data.STRIPE_SECRET_KEY.startsWith('sk_test_')) {
+  console.error('STRIPE_SECRET_KEY must be a test key (sk_test_...)');
+  process.exit(1);
+}
+if (data.STRIPE_SECRET_KEY && !data.STRIPE_WEBHOOK_SECRET) {
+  console.error('STRIPE_WEBHOOK_SECRET is required when STRIPE_SECRET_KEY is set');
+  process.exit(1);
+}
 
 /**
  * CORS with credentials cannot use `Access-Control-Allow-Origin: *`.
