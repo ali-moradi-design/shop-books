@@ -1,14 +1,24 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter, Source_Serif_4 } from 'next/font/google';
+import localFont from 'next/font/local';
 import './globals.css';
 import { SiteHeader } from '@/widgets/header';
 import { SiteFooter } from '@/widgets/footer';
 import { SITE } from '@/shared/config';
 import { Analytics } from '@/shared/ui/Analytics';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
-const sourceSerif = Source_Serif_4({
-  subsets: ['latin'],
+// Self-hosted (SIL OFL, files in ./fonts): nothing is downloaded from Google Fonts
+// at build or run time
+const inter = localFont({
+  src: './fonts/inter-latin-wght-normal.woff2',
+  weight: '100 900',
+  variable: '--font-inter',
+  display: 'swap',
+});
+const sourceSerif = localFont({
+  src: [
+    { path: './fonts/source-serif-4-latin-wght-normal.woff2', weight: '200 900', style: 'normal' },
+    { path: './fonts/source-serif-4-latin-wght-italic.woff2', weight: '200 900', style: 'italic' },
+  ],
   variable: '--font-source-serif',
   display: 'swap',
 });
