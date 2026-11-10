@@ -51,6 +51,11 @@ export class PrismaOrderRepository implements IOrderRepository {
     return row ? mapOrder(row) : null;
   }
 
+  async findByCheckoutSession(sessionId: string): Promise<Order | null> {
+    const row = await getPrisma().order.findFirst({ where: { checkoutSessionId: sessionId, deletedAt: null }, include: itemsInclude });
+    return row ? mapOrder(row) : null;
+  }
+
   async list(filter: { userId?: string; limit?: number }): Promise<Order[]> {
     const rows = await getPrisma().order.findMany({
       where: {
@@ -77,7 +82,7 @@ export class PrismaOrderRepository implements IOrderRepository {
         discountAmount,
         totalAmount: input.totalAmount,
         status: 'pending_payment',
-        paymentMethod: 'fake',
+        paymentMethod: 'stripe',
         paymentStatus: 'pending',
         shippingFullName: input.shippingAddress.fullName,
         shippingLine1: input.shippingAddress.line1,
@@ -106,6 +111,12 @@ export class PrismaOrderRepository implements IOrderRepository {
       where: { id: order.id },
       data: {
         status: order.status,
+        paymentMethod: order.payment.method,
+        checkoutSessionId: order.payment.checkoutSessionId ?? null,
+        refundId: order.refundId ?? null,
+        shipCarrier: order.shipment?.carrier ?? null,
+        shipTracking: order.shipment?.trackingNumber ?? null,
+        shippedAt: order.shipment?.shippedAt ?? null,
         paymentStatus: order.payment.status,
         paidAt: order.payment.paidAt ?? null,
         transactionId: order.payment.transactionId ?? null,

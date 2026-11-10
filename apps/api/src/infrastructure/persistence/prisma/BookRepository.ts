@@ -115,11 +115,13 @@ export class PrismaBookRepository implements IBookRepository {
     return result.count === 1;
   }
 
-  async incrementStock(bookId: string, quantity: number): Promise<void> {
-    await getPrisma().book.updateMany({
-      where: { id: bookId },
-      data: { stock: { increment: quantity } },
-    });
+  async incrementStock(bookId: string, quantity: number): Promise<boolean> {
+    // one statement, so a concurrent sale cannot slip between the read and the write
+    const rows = await getPrisma().$queryRaw<{ stock: number }[]>`
+      UPDATE "Book" SET "stock" = "stock" + ${quantity}, "updatedAt" = NOW()
+      WHERE "id" = ${bookId}
+      RETURNING "stock"`;
+    return quantity > 0 && rows.length > 0 && Number(rows[0].stock) - quantity === 0;
   }
 
   async upsertByIsbn(

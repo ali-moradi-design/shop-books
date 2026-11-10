@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
+import { captureError } from '../../../infrastructure/logging/monitoring';
 import { ZodError } from 'zod';
 import { AppError } from '../../../shared/AppError';
 import { DomainError } from '../../../domain/shared/DomainError';
@@ -47,6 +48,7 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
     return;
   }
 
+  captureError(appErr, { requestId, path: req.originalUrl });
   logger.error('unhandled_error', {
     requestId,
     err: appErr instanceof Error ? appErr.message : String(appErr),

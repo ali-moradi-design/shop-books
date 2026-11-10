@@ -1,5 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import request from 'supertest';
+import type { Server } from 'node:http';
+import type { AddressInfo } from 'node:net';
 import {
   authHeader,
   registerCustomer,
@@ -12,11 +14,19 @@ import {
 describe('Bookstore API (integration)', () => {
   let ctx: TestContext;
 
+  let server: Server;
+
   beforeAll(async () => {
     ctx = await setupTestApp();
+    // the simulator delivers webhooks over HTTP, like Stripe, so the app must listen
+    server = ctx.app.listen(0);
+    const { port } = server.address() as AddressInfo;
+    const { payments } = await import('../../src/infrastructure/composition');
+    payments.mock!.gateway.webhookUrl = `http://127.0.0.1:${port}/api/v1/payments/stripe/webhook`;
   }, 120_000);
 
   afterAll(async () => {
+    await new Promise((r) => server.close(r));
     await teardownTestApp();
   }, 60_000);
 
@@ -265,12 +275,24 @@ describe('Bookstore API (integration)', () => {
       expect(order.status).toBe('pending_payment');
       expect(order.totalAmount).toBe(bookPrice * 2);
 
-      const paid = await ctx.request
-        .post(`/api/v1/orders/${order.id}/pay`)
+      // customers pay through Stripe Checkout (here the simulator), confirmed by a signed webhook
+      await ctx.request.post(`/api/v1/orders/${order.id}/pay`).set(authHeader(token)).expect(403);
+      const start = await ctx.request.post(`/api/v1/orders/${order.id}/checkout`).set(authHeader(token)).expect(200);
+      const sessionId = new URL(start.body.data.url).pathname.split('/').pop()!;
+      expect(sessionId).toMatch(/^cs_test_mock_/);
+      await ctx.request
+        .post(`/api/v1/payments/simulator/sessions/${sessionId}/pay`)
         .set(authHeader(token))
+        .send({ card: '4000 0000 0000 0002' })
+        .expect(402);
+      await ctx.request
+        .post(`/api/v1/payments/simulator/sessions/${sessionId}/pay`)
+        .set(authHeader(token))
+        .send({ card: '4242 4242 4242 4242' })
         .expect(200);
-
+      const paid = await ctx.request.get(`/api/v1/orders/${order.id}`).set(authHeader(token)).expect(200);
       expect(paid.body.data.status).toBe('paid');
+      expect(paid.body.data.payment.method).toBe('stripe');
 
       const afterBook = await ctx.request.get(`/api/v1/books/${bookId}`).expect(200);
       expect(afterBook.body.data.stock).toBe(stockBefore - 2);
@@ -319,14 +341,15 @@ describe('Bookstore API (integration)', () => {
       const order1Id = orders1.body.data[0].id as string;
       const order2Id = orders2.body.data[0].id as string;
 
+      // staff record both payments by hand
       await ctx.request
         .post(`/api/v1/orders/${order1Id}/pay`)
-        .set(authHeader(c1.accessToken))
+        .set(authHeader(ctx.adminToken))
         .expect(200);
 
       const fail = await ctx.request
         .post(`/api/v1/orders/${order2Id}/pay`)
-        .set(authHeader(c2.accessToken))
+        .set(authHeader(ctx.adminToken))
         .expect(409);
 
       expect(fail.body.message).toMatch(/insufficient stock/i);

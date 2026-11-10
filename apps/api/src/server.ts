@@ -3,7 +3,10 @@ import { connectDb } from './infrastructure/config/db';
 import { env } from './infrastructure/config/env';
 import { logger } from './infrastructure/logging/logger';
 
+import { initMonitoring } from './infrastructure/logging/monitoring';
+
 async function main() {
+  await initMonitoring();
   await connectDb();
   app.listen(env.PORT, () => {
     logger.info('server_started', {

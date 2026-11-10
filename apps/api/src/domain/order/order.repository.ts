@@ -2,6 +2,7 @@ import type { Order, CreateOrderInput, OrderStatus, Payment } from './order.enti
 
 export interface IOrderRepository {
   findById(id: string): Promise<Order | null>;
+  findByCheckoutSession(sessionId: string): Promise<Order | null>;
   list(filter: { userId?: string; limit?: number }): Promise<Order[]>;
   create(input: CreateOrderInput): Promise<Order>;
   save(order: Order): Promise<Order>;

@@ -11,6 +11,11 @@ import { DiscountService } from '../../application/discount/discount.service';
 import { CartService } from '../../application/cart/cart.service';
 import { FavoriteService } from '../../application/favorite/favorite.service';
 import { DashboardService } from '../../application/admin/dashboard.service';
+import { CheckoutService } from '../../application/payment/checkout.service';
+import { AccountService } from '../../application/account/account.service';
+import { mailer } from '../mail';
+import { createPayments } from '../payments';
+import { env } from '../config/env';
 
 import {
   bookRepo,
@@ -52,3 +57,11 @@ export const authContextService = new AuthContextService(userRepo, roleRepo, tok
 export const cartService = new CartService(cartRepo, bookRepo, orderRepo, discountService);
 export const favoriteService = new FavoriteService(favoriteRepo, bookRepo);
 export const dashboardService = new DashboardService(userRepo, bookRepo, orderRepo, issueRepo);
+
+export const payments = createPayments(orderRepo);
+orderService.useRefunder(payments.gateway);
+export const checkoutService = new CheckoutService(orderRepo, orderService, payments.gateway, payments.verifier, {
+  storefrontUrl: env.STOREFRONT_URL.replace(/\/$/, ''),
+  currency: env.PAYMENT_CURRENCY,
+});
+export const accountService = new AccountService(roleRepo, tokenService, passwordHasher, mailer, env.STOREFRONT_URL.replace(/\/$/, ''));

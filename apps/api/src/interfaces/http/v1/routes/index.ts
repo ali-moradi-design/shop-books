@@ -12,13 +12,29 @@ import favoritesRoutes from './favorites.routes';
 import discountsRoutes from './discounts.routes';
 import uploadsRoutes from './uploads.routes';
 import adminRoutes from './admin.routes';
+import paymentsRoutes from './payments.routes';
+import { accountRoutes, publicAccountRoutes } from './account.routes';
+import {
+  auditTrail,
+  catalogExtrasRouter,
+  emailsRouter,
+  experimentsRouter,
+  insightsRouter,
+  newsletterRouter,
+  returnsRouter,
+} from './extras.routes';
 
 const v1 = Router();
+v1.use(auditTrail);
 
 v1.use('/auth', authRoutes);
+v1.use('/auth', publicAccountRoutes);
+v1.use('/account', accountRoutes);
 v1.use('/permissions', permissionsRoutes);
 v1.use('/roles', rolesRoutes);
 v1.use('/users', usersRoutes);
+// before booksRoutes, whose /:id would swallow /suggest
+v1.use('/books', catalogExtrasRouter);
 v1.use('/books', booksRoutes);
 v1.use('/reviews', reviewsRoutes);
 v1.use('/orders', ordersRoutes);
@@ -27,6 +43,12 @@ v1.use('/cart', cartRoutes);
 v1.use('/favorites', favoritesRoutes);
 v1.use('/discounts', discountsRoutes);
 v1.use('/uploads', uploadsRoutes);
+v1.use('/payments', paymentsRoutes);
+v1.use('/newsletter', newsletterRouter);
+v1.use('/emails', emailsRouter);
+v1.use('/returns', returnsRouter);
+v1.use('/experiments', experimentsRouter);
+v1.use('/admin', insightsRouter);
 v1.use('/admin', adminRoutes);
 
 export default v1;

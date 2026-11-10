@@ -9,7 +9,8 @@ export interface IBookRepository {
   update(id: string, input: UpdateBookInput): Promise<Book | null>;
   softDelete(id: string): Promise<Book | null>;
   decrementStock(bookId: string, quantity: number): Promise<boolean>;
-  incrementStock(bookId: string, quantity: number): Promise<void>;
+  /** True when the book was sold out before (so back-in-stock emails can go out). */
+  incrementStock(bookId: string, quantity: number): Promise<boolean>;
   upsertByIsbn(isbn: string, data: CreateBookInput & { coverImageUrl: string }): Promise<Book>;
   facets(): Promise<{
     categories: { name: string; count: number }[];
