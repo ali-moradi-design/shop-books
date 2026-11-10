@@ -69,4 +69,9 @@ export class Mailer implements IMailer {
   }
 }
 
+/** Hides one-time tokens (password reset, unsubscribe) in the stored copy. */
+export function redact(body: string): string {
+  return body.replace(/token=[A-Za-z0-9_-]+/g, 'token=[removed]');
+}
+
 export const mailer = new Mailer();

@@ -4,7 +4,8 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { apiRequest, ApiError } from '@/shared/api';
 import { requireToken } from '@/shared/lib/auth';
-import { recordEvents } from '@/shared/lib/ab/server';
+import { experimentEvents, postEvents } from '@/shared/lib/ab/server';
+import { after } from 'next/server';
 
 export async function addToCart(bookId: string, form: FormData): Promise<void> {
   const token = await requireToken(`/books/${bookId}`);
@@ -18,7 +19,9 @@ export async function addToCart(bookId: string, form: FormData): Promise<void> {
       `/books/${bookId}?error=${encodeURIComponent(e instanceof ApiError ? e.message : 'Could not add to cart')}`,
     );
   }
-  await recordEvents('add_to_cart');
+  // counted after the response, so adding to the cart does not wait for it
+  const events = await experimentEvents('add_to_cart');
+  after(() => postEvents(events));
   revalidatePath('/', 'layout');
   redirect('/cart');
 }

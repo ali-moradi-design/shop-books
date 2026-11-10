@@ -20,11 +20,10 @@ interface ApiUser {
 }
 
 async function Customers() {
-  const { users, token } = await adminData('/admin/customers', async (token) => ({
+  // `me` comes with the admin check, so no extra request
+  const { users, me } = await adminData('/admin/customers', async (token) => ({
     users: (await apiRequest<ApiData<ApiUser[]>>('/users', { token, cache: 'no-store' })).data,
   }));
-  const me = (await apiRequest<ApiData<{ id: string }>>('/users/me', { token, cache: 'no-store' }))
-    .data;
   return (
     <Table label="Customers" head={['Name', 'Email', 'Roles', 'Joined', 'Status', '']}>
       {users.map((u) => (
