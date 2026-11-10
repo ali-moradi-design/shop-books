@@ -28,7 +28,8 @@ async function Orders({ searchParams }: { searchParams: SP }) {
   const { orders } = await adminData('/admin/orders', async (token) => ({
     orders: await fetchMyOrders(token),
   }));
-  const shown = status ? orders.filter((o) => o.status === status) : orders;
+  // newest first; the table shows the latest 200 so the page stays quick
+  const shown = (status ? orders.filter((o) => o.status === status) : orders).slice(0, 200);
   return (
     <>
       <nav
