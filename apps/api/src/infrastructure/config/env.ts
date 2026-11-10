@@ -27,6 +27,8 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   // Requests per IP per 15 minutes. The storefront's server renders (and its build) share one IP.
   RATE_LIMIT_MAX: z.coerce.number().int().positive().optional(),
+  // proxies in front of the API: 1 when the storefront forwards the visitor's address
+  TRUST_PROXY: z.coerce.number().int().nonnegative().default(0),
   CORS_ORIGIN: z.string().default('http://localhost:3000'),
   UPLOAD_DIR: z.string().default('uploads'),
   COOKIE_SECURE: optionalBool,

@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { apiRequest, ApiError } from '@/shared/api';
+import { visitorIp } from '@/shared/lib/visitor-ip';
 import {
   REFRESH_COOKIE,
   requireToken,
@@ -22,6 +23,7 @@ const fail = (e: unknown, fallback: string): ActionState => ({
 export async function forgotPassword(_prev: ActionState, form: FormData): Promise<ActionState> {
   try {
     await apiRequest('/auth/forgot-password', {
+      ip: await visitorIp(),
       method: 'POST',
       json: { email: str(form, 'email') },
     });
@@ -44,7 +46,11 @@ export async function resetPassword(
   if (password !== String(form.get('confirm') ?? ''))
     return { error: 'The passwords do not match.' };
   try {
-    await apiRequest('/auth/reset-password', { method: 'POST', json: { token, password } });
+    await apiRequest('/auth/reset-password', {
+      ip: await visitorIp(),
+      method: 'POST',
+      json: { token, password },
+    });
   } catch (e) {
     return fail(e, 'Could not set the password.');
   }
@@ -56,6 +62,7 @@ export async function startGuest(_prev: ActionState, form: FormData): Promise<Ac
   let res: TokenPair;
   try {
     res = await apiRequest<TokenPair>('/auth/guest', {
+      ip: await visitorIp(),
       method: 'POST',
       json: { name: str(form, 'name'), email: str(form, 'email') },
     });

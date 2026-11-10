@@ -38,6 +38,8 @@ services:
       # links in emails send customers back here
       STOREFRONT_URL: https://shop-books.ali-moradi-develop.com
       COOKIE_SECURE: "true"
+      # the storefront forwards the visitor's address on sign-in, so limits count visitors
+      TRUST_PROXY: 1
       # seed and the nightly demo reset tell the storefront to drop its cached catalog
       WEB_REVALIDATE_URL: http://web:3000/hooks/revalidate
       REVALIDATE_SECRET: ${REVALIDATE_SECRET:?REVALIDATE_SECRET is not set}

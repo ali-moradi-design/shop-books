@@ -7,10 +7,12 @@ export type FetchInit = Omit<RequestInit, 'body'> & {
   json?: unknown;
   /** Bearer access token for authenticated endpoints. */
   token?: string;
+  /** The visitor's address, so the API rate-limits sign-ins per visitor (see visitorIp). */
+  ip?: string;
 };
 
 export async function apiRequest<T>(path: string, init: FetchInit = {}): Promise<T> {
-  const { json, token, headers, ...rest } = init;
+  const { json, token, ip, headers, ...rest } = init;
   const url = `${API_V1}${path.startsWith('/') ? path : `/${path}`}`;
   const res = await fetch(url, {
     ...rest,
@@ -19,6 +21,7 @@ export async function apiRequest<T>(path: string, init: FetchInit = {}): Promise
       Accept: 'application/json',
       ...(json !== undefined ? { 'Content-Type': 'application/json' } : {}),
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(ip ? { 'X-Forwarded-For': ip } : {}),
       ...(headers ?? {}),
     },
   });
