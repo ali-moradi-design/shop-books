@@ -101,7 +101,7 @@ export async function deleteBook(id: string): Promise<void> {
   const token = await requireToken('/admin/books');
   await apiRequest(`/books/${encodeURIComponent(id)}`, { method: 'DELETE', token });
   updateTag('books');
-  redirect('/admin/books?msg=' + encodeURIComponent('Book removed from the shop.'));
+  redirect('/admin/books?removed=1');
 }
 
 export interface ImportReport {

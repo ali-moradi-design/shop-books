@@ -71,7 +71,9 @@ async function OrderDetail({
       {result === 'cancelled' && pending && (
         <Notice>Payment cancelled. Your order is saved; pay for it whenever you are ready.</Notice>
       )}
-      {sp.error && <Notice tone="error">{firstParam(sp.error)}</Notice>}
+      {sp.payment === 'unavailable' && (
+        <Notice tone="error">Could not open the payment page. Try again.</Notice>
+      )}
       <div className="flex flex-wrap items-center gap-4">
         <h1 className="font-serif text-4xl font-medium text-forest-900">
           Order {order.id.slice(-8)}

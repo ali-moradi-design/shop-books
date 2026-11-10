@@ -30,9 +30,9 @@ async function Books({ searchParams }: { searchParams: SP }) {
   }));
   return (
     <>
-      {sp.msg && (
+      {sp.removed && (
         <div className="mb-4">
-          <Notice tone="success">{firstParam(sp.msg)}</Notice>
+          <Notice tone="success">Book removed from the shop.</Notice>
         </div>
       )}
       <form role="search" className="mb-5 flex max-w-md gap-2">

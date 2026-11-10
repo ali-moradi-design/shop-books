@@ -48,7 +48,7 @@ export async function resetPassword(
   } catch (e) {
     return fail(e, 'Could not set the password.');
   }
-  redirect('/login?msg=' + encodeURIComponent('Your password is set. Sign in with it now.'));
+  redirect('/login?reset=1');
 }
 
 /** Guest checkout: a passwordless account, signed in at once. */
