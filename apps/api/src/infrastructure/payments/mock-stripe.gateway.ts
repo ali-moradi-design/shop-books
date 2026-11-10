@@ -1,6 +1,10 @@
 import { randomBytes } from 'node:crypto';
 import type Stripe from 'stripe';
-import type { CheckoutSessionRef, CreateCheckoutInput, PaymentGateway } from '../../application/payment/payments.port';
+import type {
+  CheckoutSessionRef,
+  CreateCheckoutInput,
+  PaymentGateway,
+} from '../../application/payment/payments.port';
 
 /**
  * A local stand-in for Stripe Checkout, for running the shop without a Stripe
@@ -35,7 +39,13 @@ export class MockStripeGateway implements PaymentGateway {
   /** Builds, signs and delivers a webhook event, like Stripe's servers do. */
   async sendEvent(
     type: string,
-    session: { id: string; orderId: string; amount: number; currency: string; paymentStatus: string },
+    session: {
+      id: string;
+      orderId: string;
+      amount: number;
+      currency: string;
+      paymentStatus: string;
+    },
   ): Promise<void> {
     const created = Math.floor(Date.now() / 1000);
     const payload = JSON.stringify({
@@ -62,10 +72,17 @@ export class MockStripeGateway implements PaymentGateway {
         },
       },
     });
-    const signature = this.stripe.webhooks.generateTestHeaderString({ payload, secret: this.webhookSecret });
+    const signature = this.stripe.webhooks.generateTestHeaderString({
+      payload,
+      secret: this.webhookSecret,
+    });
     const res = await fetch(this.webhookUrl, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Stripe-Signature': signature, 'User-Agent': 'Stripe/1.0 (mock)' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Stripe-Signature': signature,
+        'User-Agent': 'Stripe/1.0 (mock)',
+      },
       body: payload,
       signal: AbortSignal.timeout(10_000),
     });

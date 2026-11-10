@@ -151,7 +151,9 @@ export function mapOrder(row: OrderWithItems): Order {
     ? row.statusHistory
     : []) as unknown as StatusHistory[];
   const payment: Payment = {
-    method: (['fake', 'stripe', 'manual'].includes(row.paymentMethod) ? row.paymentMethod : 'fake') as Payment['method'],
+    method: (['fake', 'stripe', 'manual'].includes(row.paymentMethod)
+      ? row.paymentMethod
+      : 'fake') as Payment['method'],
     checkoutSessionId: row.checkoutSessionId ?? undefined,
     status: row.paymentStatus,
     paidAt: row.paidAt ?? undefined,
@@ -179,7 +181,11 @@ export function mapOrder(row: OrderWithItems): Order {
     shippingAddress,
     shipment:
       row.shipCarrier && row.shipTracking && row.shippedAt
-        ? { carrier: row.shipCarrier as Carrier, trackingNumber: row.shipTracking, shippedAt: row.shippedAt }
+        ? {
+            carrier: row.shipCarrier as Carrier,
+            trackingNumber: row.shipTracking,
+            shippedAt: row.shippedAt,
+          }
         : undefined,
     refundId: row.refundId ?? undefined,
     statusHistory: history.map((h) => ({

@@ -35,7 +35,9 @@ export class StripeGateway implements PaymentGateway {
         cancel_url: input.cancelUrl,
       },
       // a double click must not open two sessions for one order
-      { idempotencyKey: `checkout-${input.orderId}-${input.amount}-${Math.floor(Date.now() / 60_000)}` },
+      {
+        idempotencyKey: `checkout-${input.orderId}-${input.amount}-${Math.floor(Date.now() / 60_000)}`,
+      },
     );
     if (!session.url) throw new Error('Stripe returned a session without a URL');
     return { id: session.id, url: session.url };

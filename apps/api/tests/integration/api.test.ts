@@ -277,7 +277,10 @@ describe('Bookstore API (integration)', () => {
 
       // customers pay through Stripe Checkout (here the simulator), confirmed by a signed webhook
       await ctx.request.post(`/api/v1/orders/${order.id}/pay`).set(authHeader(token)).expect(403);
-      const start = await ctx.request.post(`/api/v1/orders/${order.id}/checkout`).set(authHeader(token)).expect(200);
+      const start = await ctx.request
+        .post(`/api/v1/orders/${order.id}/checkout`)
+        .set(authHeader(token))
+        .expect(200);
       const sessionId = new URL(start.body.data.url).pathname.split('/').pop()!;
       expect(sessionId).toMatch(/^cs_test_mock_/);
       await ctx.request
@@ -290,7 +293,10 @@ describe('Bookstore API (integration)', () => {
         .set(authHeader(token))
         .send({ card: '4242 4242 4242 4242' })
         .expect(200);
-      const paid = await ctx.request.get(`/api/v1/orders/${order.id}`).set(authHeader(token)).expect(200);
+      const paid = await ctx.request
+        .get(`/api/v1/orders/${order.id}`)
+        .set(authHeader(token))
+        .expect(200);
       expect(paid.body.data.status).toBe('paid');
       expect(paid.body.data.payment.method).toBe('stripe');
 

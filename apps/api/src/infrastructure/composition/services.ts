@@ -60,8 +60,20 @@ export const dashboardService = new DashboardService(userRepo, bookRepo, orderRe
 
 export const payments = createPayments(orderRepo);
 orderService.useRefunder(payments.gateway);
-export const checkoutService = new CheckoutService(orderRepo, orderService, payments.gateway, payments.verifier, {
-  storefrontUrl: env.STOREFRONT_URL.replace(/\/$/, ''),
-  currency: env.PAYMENT_CURRENCY,
-});
-export const accountService = new AccountService(roleRepo, tokenService, passwordHasher, mailer, env.STOREFRONT_URL.replace(/\/$/, ''));
+export const checkoutService = new CheckoutService(
+  orderRepo,
+  orderService,
+  payments.gateway,
+  payments.verifier,
+  {
+    storefrontUrl: env.STOREFRONT_URL.replace(/\/$/, ''),
+    currency: env.PAYMENT_CURRENCY,
+  },
+);
+export const accountService = new AccountService(
+  roleRepo,
+  tokenService,
+  passwordHasher,
+  mailer,
+  env.STOREFRONT_URL.replace(/\/$/, ''),
+);

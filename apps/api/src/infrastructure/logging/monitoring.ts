@@ -12,7 +12,8 @@ export async function initMonitoring(): Promise<void> {
   if (!env.SENTRY_DSN) return;
   const Sentry = await import('@sentry/node');
   Sentry.init({ dsn: env.SENTRY_DSN, environment: env.NODE_ENV, tracesSampleRate: 0 });
-  capture = (err, context) => Sentry.captureException(err, context ? { extra: context } : undefined);
+  capture = (err, context) =>
+    Sentry.captureException(err, context ? { extra: context } : undefined);
 }
 
 /** Reports an unexpected error (no-op without Sentry). */

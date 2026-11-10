@@ -10,7 +10,14 @@ export default defineConfig({
   retries: process.env.CI ? 1 : 0,
   reporter: process.env.CI ? [['github'], ['list']] : 'list',
   timeout: 60_000,
-  use: { baseURL: `http://localhost:${webPort}`, trace: 'retain-on-failure' },
+  use: {
+    baseURL: `http://localhost:${webPort}`,
+    trace: 'retain-on-failure',
+    // a preinstalled Chromium (e.g. a sandbox) instead of Playwright's download
+    ...(process.env.PLAYWRIGHT_CHROMIUM_PATH && {
+      launchOptions: { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH },
+    }),
+  },
   projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
   webServer: [
     {

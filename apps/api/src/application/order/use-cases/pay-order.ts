@@ -109,12 +109,20 @@ export class PayOrderUseCase {
 
       if (err instanceof DomainError && err.code === 'INSUFFICIENT_STOCK') {
         order.status = 'failed';
-        order.payment = { ...order.payment, method: receipt.method, status: 'failed', transactionId: receipt.transactionId };
+        order.payment = {
+          ...order.payment,
+          method: receipt.method,
+          status: 'failed',
+          transactionId: receipt.transactionId,
+        };
         order.statusHistory.push({
           status: 'failed',
           at: new Date(),
           // the provider already took the money, so staff must refund it
-          note: receipt.method === 'stripe' ? `${err.message}. Refund ${receipt.transactionId} in Stripe.` : err.message,
+          note:
+            receipt.method === 'stripe'
+              ? `${err.message}. Refund ${receipt.transactionId} in Stripe.`
+              : err.message,
         });
         await this.orders.save(order);
       }

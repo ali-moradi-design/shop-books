@@ -41,7 +41,8 @@ export class BookService {
     const book = await this.books.update(id, input);
     if (!book) throw new AppError('Book not found', 404);
     // back on the shelf: tell whoever asked to be notified
-    if (before && before.stock === 0 && book.stock > 0) await domainEvents.publish(stockRestoredEvent({ bookId: book.id }));
+    if (before && before.stock === 0 && book.stock > 0)
+      await domainEvents.publish(stockRestoredEvent({ bookId: book.id }));
     return book;
   }
 

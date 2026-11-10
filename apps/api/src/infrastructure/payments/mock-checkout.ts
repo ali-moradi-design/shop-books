@@ -29,14 +29,21 @@ export class MockCheckout {
     };
   }
 
-  async pay(sessionId: string, userId: string, cardNumber: string): Promise<{ redirectUrl: string }> {
+  async pay(
+    sessionId: string,
+    userId: string,
+    cardNumber: string,
+  ): Promise<{ redirectUrl: string }> {
     const order = await this.orderFor(sessionId, userId);
     const successUrl = this.orderUrl(order.id, 'success');
     if (order.status !== 'pending_payment') return { redirectUrl: successUrl };
 
     const card = MOCK_CARDS[cardNumber.replace(/\D/g, '')];
     if (!card) {
-      throw new DomainError('Use a Stripe test card, such as 4242 4242 4242 4242.', 'PAYMENT_DECLINED');
+      throw new DomainError(
+        'Use a Stripe test card, such as 4242 4242 4242 4242.',
+        'PAYMENT_DECLINED',
+      );
     }
     if (!card.ok) throw new DomainError(card.message, 'PAYMENT_DECLINED');
 
@@ -53,7 +60,8 @@ export class MockCheckout {
   private async orderFor(sessionId: string, userId: string) {
     const order = await this.orders.findByCheckoutSession(sessionId);
     // someone else's session looks the same as a missing one
-    if (!order || order.user !== userId) throw new DomainError('Checkout session not found', 'NOT_FOUND');
+    if (!order || order.user !== userId)
+      throw new DomainError('Checkout session not found', 'NOT_FOUND');
     return order;
   }
 

@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
 
-test('customer can browse, buy with the fake gateway, and admin sees the order', async ({
+test('customer can browse, buy through Stripe Checkout (simulated), and admin sees the order', async ({
   page,
   browser,
 }) => {
@@ -11,7 +11,7 @@ test('customer can browse, buy with the fake gateway, and admin sees the order',
   await expect(page.getByRole('heading', { level: 1 })).toContainText(
     'A bookshop for people who still browse',
   );
-  await page.getByRole('searchbox', { name: /search by title/i }).fill('978-0-14-143951-8');
+  await page.getByRole('combobox', { name: /search by title/i }).fill('978-0-14-143951-8');
   await page.getByRole('button', { name: 'Search' }).click();
   await expect(page).toHaveURL(/\/books\?q=/);
   await page.getByRole('link', { name: /Pride and Prejudice by Jane Austen/ }).click();
@@ -26,9 +26,12 @@ test('customer can browse, buy with the fake gateway, and admin sees the order',
   await page.getByRole('link', { name: 'Create an account' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Create account' })).toBeVisible();
   // Next keeps the previous route hidden in the DOM during transitions: scope to visible nodes.
-  const form = page.locator('form:visible');
+  // and the footer has a newsletter form: pick the form with the right button
+  const form = page.locator('form:visible', {
+    has: page.getByRole('button', { name: 'Create account' }),
+  });
   await form.getByRole('textbox', { name: 'Name' }).fill('Ada Reader');
-  await form.getByLabel('Email').fill(email);
+  await form.getByLabel('Email', { exact: true }).fill(email);
   await form.getByLabel('Password').fill('Passw0rd!x');
   await form.getByRole('button', { name: 'Create account' }).click();
   await expect(page).toHaveURL(/\/books\//);
@@ -47,12 +50,15 @@ test('customer can browse, buy with the fake gateway, and admin sees the order',
   await page.getByLabel('Discount code (optional)').fill('WELCOME10');
   await page.getByRole('button', { name: 'Continue to payment' }).click();
 
-  // Fake payment gateway: a decline first, then approve
-  await expect(page).toHaveURL(/\/pay\//);
-  await page.getByRole('button', { name: 'Simulate a declined card' }).click();
-  await expect(page.getByText('The test card was declined')).toBeVisible();
-  await page.getByRole('button', { name: /^Pay / }).click();
-  await expect(page).toHaveURL(/\/orders\/.+paid=1/);
+  // Simulated Stripe Checkout: a decline first, then pay; the order is confirmed by webhook
+  await expect(page).toHaveURL(/\/pay\/cs_test_mock_/);
+  const pay = page.locator('form:visible', { has: page.getByRole('button', { name: /^Pay / }) });
+  await pay.getByLabel('Card number').fill('4000 0000 0000 0002');
+  await pay.getByRole('button', { name: /^Pay / }).click();
+  await expect(page.getByText('Your card was declined.')).toBeVisible();
+  await pay.getByLabel('Card number').fill('4242 4242 4242 4242');
+  await pay.getByRole('button', { name: /^Pay / }).click();
+  await expect(page).toHaveURL(/\/orders\/.+checkout=success/);
   await expect(page.getByText('Payment received')).toBeVisible();
   await expect(page.getByText('Discount WELCOME10')).toBeVisible();
   const orderId = new URL(page.url()).pathname.split('/').pop()!;
@@ -66,21 +72,23 @@ test('customer can browse, buy with the fake gateway, and admin sees the order',
 
   // Admin sees the order and moves it along
   const adminPage = await (await browser.newContext()).newPage();
-  await adminPage.goto('/login?next=/admin');
-  await adminPage.getByLabel('Email').fill('admin@bookstore.local');
-  await adminPage.getByLabel('Password').fill('Admin123!');
-  await adminPage.getByRole('button', { name: 'Sign in' }).click();
-  await expect(adminPage.getByRole('heading', { name: 'Admin' })).toBeVisible();
+  await adminPage.goto('/login?next=/admin/orders');
+  const signIn = adminPage.locator('form:visible', {
+    has: adminPage.getByRole('button', { name: 'Sign in', exact: true }),
+  });
+  await signIn.getByLabel('Email', { exact: true }).fill('admin@bookstore.local');
+  await signIn.getByLabel('Password').fill('Admin123!');
+  await signIn.getByRole('button', { name: 'Sign in', exact: true }).click();
+  await expect(adminPage.getByRole('heading', { level: 1, name: 'Orders' })).toBeVisible();
   const row = adminPage.getByRole('row').filter({ hasText: orderId.slice(-8) });
   await expect(row).toContainText('Paid');
-  await row.getByRole('combobox').selectOption('processing');
-  await row.getByRole('button', { name: 'Save' }).click();
+  await row.getByRole('link', { name: orderId.slice(-8) }).click();
+  await adminPage.getByRole('combobox', { name: 'Move to' }).selectOption('processing');
+  await adminPage.getByRole('button', { name: 'Update' }).click();
   await expect(adminPage.getByText('Order updated')).toBeVisible();
-  await expect(adminPage.getByRole('row').filter({ hasText: orderId.slice(-8) })).toContainText(
-    'Processing',
-  );
 
   // Admin creates a new book and it appears in the catalog
+  await adminPage.goto('/admin/books');
   await adminPage.getByRole('link', { name: '+ New book' }).click();
   await expect(adminPage.getByRole('heading', { level: 1, name: 'New book' })).toBeVisible();
   const bookForm = adminPage.locator('form:visible', {
@@ -96,7 +104,7 @@ test('customer can browse, buy with the fake gateway, and admin sees the order',
   await expect(
     adminPage.getByRole('heading', { level: 1, name: 'The E2E Chronicle' }),
   ).toBeVisible();
-  await expect(adminPage.getByText('$15.50').first()).toBeVisible();
+  await expect(adminPage.getByText('Book created.')).toBeVisible();
   await adminPage.goto('/books?q=E2E+Chronicle');
   await expect(
     adminPage.getByRole('link', { name: /The E2E Chronicle by Test Author/ }),

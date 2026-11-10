@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { apiRequest, ApiError } from '@/shared/api';
 import { requireToken } from '@/shared/lib/auth';
+import { recordEvents } from '@/shared/lib/ab/server';
 
 export async function addToCart(bookId: string, form: FormData): Promise<void> {
   const token = await requireToken(`/books/${bookId}`);
@@ -17,6 +18,7 @@ export async function addToCart(bookId: string, form: FormData): Promise<void> {
       `/books/${bookId}?error=${encodeURIComponent(e instanceof ApiError ? e.message : 'Could not add to cart')}`,
     );
   }
+  await recordEvents('add_to_cart');
   revalidatePath('/', 'layout');
   redirect('/cart');
 }

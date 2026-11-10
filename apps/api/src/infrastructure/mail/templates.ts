@@ -11,7 +11,10 @@ const money = (cents: number) => `$${(cents / 100).toFixed(2)}`;
 const orderNo = (id: string) => id.slice(-8);
 
 function escape(s: string): string {
-  return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+  return s.replace(
+    /[&<>"']/g,
+    (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!,
+  );
 }
 
 interface Action {
@@ -23,7 +26,12 @@ interface Action {
  * One plain layout for every email: readable in clients without CSS, and the
  * text part says the same as the HTML part.
  */
-function layout(subject: string, lines: string[], action?: Action, footer?: Action & { before: string }): RenderedEmail {
+function layout(
+  subject: string,
+  lines: string[],
+  action?: Action,
+  footer?: Action & { before: string },
+): RenderedEmail {
   const paragraphs = lines.map((l) => `<p style="margin:0 0 14px">${escape(l)}</p>`).join('');
   const button = action
     ? `<p style="margin:24px 0"><a href="${escape(action.url)}" style="background:#24543a;color:#ffffff;padding:12px 20px;text-decoration:none;display:inline-block">${escape(action.label)}</a></p>`
@@ -44,13 +52,19 @@ function layout(subject: string, lines: string[], action?: Action, footer?: Acti
   return { subject, text, html };
 }
 
-const orderLink = (id: string): Action => ({ label: 'View your order', url: `${shop()}/orders/${id}` });
+const orderLink = (id: string): Action => ({
+  label: 'View your order',
+  url: `${shop()}/orders/${id}`,
+});
 
 export const templates = {
   welcome: (name: string) =>
     layout(
       'Welcome to Bay Book Company',
-      [`Hi ${name},`, 'Thanks for creating an account. Your orders, reading list and saved addresses are now in one place.'],
+      [
+        `Hi ${name},`,
+        'Thanks for creating an account. Your orders, reading list and saved addresses are now in one place.',
+      ],
       { label: 'Visit the shop', url: shop() },
     ),
 
@@ -77,11 +91,18 @@ export const templates = {
   passwordChanged: (name: string) =>
     layout(
       'Your password was changed',
-      [`Hi ${name},`, 'Your password was just changed and your other devices were signed out. If this was not you, reset your password now.'],
+      [
+        `Hi ${name},`,
+        'Your password was just changed and your other devices were signed out. If this was not you, reset your password now.',
+      ],
       { label: 'Reset password', url: `${shop()}/forgot-password` },
     ),
 
-  orderConfirmed: (order: { id: string; totalAmount: number; items: { title: string; quantity: number }[] }) =>
+  orderConfirmed: (order: {
+    id: string;
+    totalAmount: number;
+    items: { title: string; quantity: number }[];
+  }) =>
     layout(
       `Order ${orderNo(order.id)} confirmed`,
       [
@@ -92,10 +113,16 @@ export const templates = {
       orderLink(order.id),
     ),
 
-  orderShipped: (order: { id: string }, tracking?: { carrier: string; trackingNumber: string; url?: string }) =>
+  orderShipped: (
+    order: { id: string },
+    tracking?: { carrier: string; trackingNumber: string; url?: string },
+  ) =>
     layout(
       `Order ${orderNo(order.id)} is on its way`,
-      ['Your books are on their way.', ...(tracking ? [`${tracking.carrier} tracking number: ${tracking.trackingNumber}`] : [])],
+      [
+        'Your books are on their way.',
+        ...(tracking ? [`${tracking.carrier} tracking number: ${tracking.trackingNumber}`] : []),
+      ],
       tracking?.url ? { label: 'Track your parcel', url: tracking.url } : orderLink(order.id),
     ),
 
@@ -104,7 +131,9 @@ export const templates = {
       `Order ${orderNo(order.id)} cancelled`,
       [
         'Your order has been cancelled.',
-        refunded ? 'We have refunded your payment. It can take 5–10 days to show on your statement.' : 'You were not charged.',
+        refunded
+          ? 'We have refunded your payment. It can take 5–10 days to show on your statement.'
+          : 'You were not charged.',
       ],
       orderLink(order.id),
     ),
@@ -119,7 +148,9 @@ export const templates = {
   backInStock: (p: { id: string; title: string; author: string }) =>
     layout(
       `${p.title} is back in stock`,
-      [`Good news: ${p.title} by ${p.author} is back on our shelves. Copies go quickly, so do not wait too long.`],
+      [
+        `Good news: ${p.title} by ${p.author} is back on our shelves. Copies go quickly, so do not wait too long.`,
+      ],
       { label: 'Get your copy', url: `${shop()}/books/${p.id}` },
     ),
 
@@ -132,7 +163,9 @@ export const templates = {
   newsletterWelcome: (unsubscribeUrl: string) =>
     layout(
       'You are on the list',
-      ['Thanks for subscribing. We write about new arrivals, staff picks and events, about once a month.'],
+      [
+        'Thanks for subscribing. We write about new arrivals, staff picks and events, about once a month.',
+      ],
       { label: 'Visit the shop', url: shop() },
       { before: 'Not for you?', label: 'Unsubscribe', url: unsubscribeUrl },
     ),

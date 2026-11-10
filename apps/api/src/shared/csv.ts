@@ -59,7 +59,10 @@ export function parseCsv(text: string): string[][] {
 }
 
 /** Rows as objects keyed by the (trimmed, lower-cased) header. */
-export function parseCsvObjects(text: string): { header: string[]; records: Record<string, string>[] } {
+export function parseCsvObjects(text: string): {
+  header: string[];
+  records: Record<string, string>[];
+} {
   const [head = [], ...rest] = parseCsv(text);
   const header = head.map((h) => h.trim().toLowerCase());
   return {

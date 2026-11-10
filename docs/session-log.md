@@ -26,10 +26,16 @@ Walk through in this order. Each step is one merged branch; `git log --oneline` 
    `docker compose up -d --build` runs Postgres, migrations + seed, API and web (the web `local`
    Dockerfile target builds at container start, once the API is up).
 
+9. **Shop features** (this branch): Stripe Checkout with a local simulator and signed webhooks;
+   email (SMTP or an outbox in Admin → Emails); password reset, guest checkout, account settings and
+   address book; cancel and returns with refunds; tracking numbers and printable labels; back-in-stock
+   emails; live search suggestions; newsletter; a full admin (books, orders, returns, discounts,
+   customers, reviews, emails, A/B tests, roles, activity, CSV export and import); A/B testing via
+   `proxy.ts`; About and Help pages; no search indexing; optional Sentry and analytics.
+
 ## Known gaps / next steps
 
 - The production images (`deploy/`) and the CI workflow have not been run here; the local root `compose.yaml` has.
 - Branch protection (required check `ci`) must be set by the owner in GitHub settings.
 - "Look inside" samples exist for 6 public-domain books only.
 - Star ratings are not shown on listing cards.
-- Admin cannot edit or delete a book's other fields yet (only price/stock; creation is supported).

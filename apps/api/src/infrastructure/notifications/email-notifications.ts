@@ -21,12 +21,16 @@ function safely<T>(name: DomainEventName, fn: (payload: T) => Promise<void>) {
     try {
       await fn(event.payload as T);
     } catch (err) {
-      log.error('notification failed', { event: name, error: err instanceof Error ? err.message : String(err) });
+      log.error('notification failed', {
+        event: name,
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
   });
 }
 
-const emailOf = async (userId: string) => (await prisma.user.findUnique({ where: { id: userId }, select: { email: true } }))?.email ?? null;
+const emailOf = async (userId: string) =>
+  (await prisma.user.findUnique({ where: { id: userId }, select: { email: true } }))?.email ?? null;
 const RETURN_LABEL: Record<string, string> = {
   requested: 'received',
   approved: 'approved: send the books back',
@@ -38,25 +42,53 @@ const RETURN_LABEL: Record<string, string> = {
 /** Customer and staff emails for order, return and stock events. Call once at startup. */
 export function registerEmailNotifications(): void {
   safely<{ orderId: string; userId: string }>('OrderPaid', async ({ orderId, userId }) => {
-    const [order, to] = await Promise.all([prisma.order.findUnique({ where: { id: orderId }, include: { items: true } }), emailOf(userId)]);
-    if (order && to) await mailer.send({ to, template: 'order-confirmed', ...templates.orderConfirmed(order) });
+    const [order, to] = await Promise.all([
+      prisma.order.findUnique({ where: { id: orderId }, include: { items: true } }),
+      emailOf(userId),
+    ]);
+    if (order && to)
+      await mailer.send({ to, template: 'order-confirmed', ...templates.orderConfirmed(order) });
   });
 
   safely<OrderChangedPayload>('OrderShipped', async ({ orderId, userId }) => {
-    const [order, to] = await Promise.all([prisma.order.findUnique({ where: { id: orderId } }), emailOf(userId)]);
+    const [order, to] = await Promise.all([
+      prisma.order.findUnique({ where: { id: orderId } }),
+      emailOf(userId),
+    ]);
     if (!order || !to) return;
-    const tracking = order.shipCarrier && order.shipTracking ? { carrier: order.shipCarrier, trackingNumber: order.shipTracking, url: trackingUrl(order.shipCarrier, order.shipTracking) } : undefined;
-    await mailer.send({ to, template: 'order-shipped', ...templates.orderShipped(order, tracking) });
+    const tracking =
+      order.shipCarrier && order.shipTracking
+        ? {
+            carrier: order.shipCarrier,
+            trackingNumber: order.shipTracking,
+            url: trackingUrl(order.shipCarrier, order.shipTracking),
+          }
+        : undefined;
+    await mailer.send({
+      to,
+      template: 'order-shipped',
+      ...templates.orderShipped(order, tracking),
+    });
   });
 
   safely<OrderChangedPayload>('OrderCancelled', async ({ orderId, userId, refunded }) => {
     const to = await emailOf(userId);
-    if (to) await mailer.send({ to, template: 'order-cancelled', ...templates.orderCancelled({ id: orderId }, Boolean(refunded)) });
+    if (to)
+      await mailer.send({
+        to,
+        template: 'order-cancelled',
+        ...templates.orderCancelled({ id: orderId }, Boolean(refunded)),
+      });
   });
 
   safely<ReturnEventPayload>('ReturnUpdated', async ({ orderId, userId, status, note }) => {
     const to = await emailOf(userId);
-    if (to) await mailer.send({ to, template: 'return-update', ...templates.returnUpdate({ order: orderId, status: RETURN_LABEL[status] ?? status, note }) });
+    if (to)
+      await mailer.send({
+        to,
+        template: 'return-update',
+        ...templates.returnUpdate({ order: orderId, status: RETURN_LABEL[status] ?? status, note }),
+      });
   });
 
   safely<StockRestoredPayload>('StockRestored', async ({ bookId }) => {
@@ -66,7 +98,21 @@ export function registerEmailNotifications(): void {
   safely<StockLowPayload>('StockLow', async ({ bookId, title, stock }) => {
     const recipients = env.ADMIN_ALERT_EMAIL
       ? [env.ADMIN_ALERT_EMAIL]
-      : (await prisma.user.findMany({ where: { isActive: true, deletedAt: null, roles: { some: { role: { name: 'admin' } } } }, select: { email: true } })).map((u) => u.email);
-    for (const to of recipients) await mailer.send({ to, template: 'low-stock', ...templates.lowStock({ id: bookId, title, stock }) });
+      : (
+          await prisma.user.findMany({
+            where: {
+              isActive: true,
+              deletedAt: null,
+              roles: { some: { role: { name: 'admin' } } },
+            },
+            select: { email: true },
+          })
+        ).map((u) => u.email);
+    for (const to of recipients)
+      await mailer.send({
+        to,
+        template: 'low-stock',
+        ...templates.lowStock({ id: bookId, title, stock }),
+      });
   });
 }

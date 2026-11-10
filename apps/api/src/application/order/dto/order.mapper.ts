@@ -38,7 +38,12 @@ export function toOrderDto(order: Order): OrderDto {
     },
     shippingAddress: order.shippingAddress,
     statusHistory: order.statusHistory,
-    shipment: order.shipment ? { ...order.shipment, url: trackingUrl(order.shipment.carrier, order.shipment.trackingNumber) } : undefined,
+    shipment: order.shipment
+      ? {
+          ...order.shipment,
+          url: trackingUrl(order.shipment.carrier, order.shipment.trackingNumber),
+        }
+      : undefined,
     refunded: Boolean(order.refundId),
     createdAt: order.createdAt,
     updatedAt: order.updatedAt,

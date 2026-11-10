@@ -57,9 +57,13 @@ export class Mailer implements IMailer {
       }
     }
     try {
-      await prisma.emailMessage.create({ data: { ...email, to: email.to.toLowerCase(), status, error } });
+      await prisma.emailMessage.create({
+        data: { ...email, to: email.to.toLowerCase(), status, error },
+      });
     } catch (err) {
-      log.error('could not store email', { error: err instanceof Error ? err.message : String(err) });
+      log.error('could not store email', {
+        error: err instanceof Error ? err.message : String(err),
+      });
     }
     return status;
   }

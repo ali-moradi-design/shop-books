@@ -8,7 +8,11 @@ import { setAuthCookies, clearAuthCookies, resolveRefreshToken } from '../../coo
 export const register = asyncHandler(async (req: Request, res: Response) => {
   const result = await authService.register(req.body);
   setAuthCookies(res, result);
-  await mailer.send({ to: result.user.email, template: 'welcome', ...templates.welcome(result.user.name) });
+  await mailer.send({
+    to: result.user.email,
+    template: 'welcome',
+    ...templates.welcome(result.user.name),
+  });
   res.status(201).json(result);
 });
 

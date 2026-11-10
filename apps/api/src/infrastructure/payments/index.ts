@@ -37,6 +37,9 @@ export function createPayments(orders: IOrderRepository): {
   return {
     gateway,
     verifier: new StripeWebhookVerifier(stripe, secret),
-    mock: { gateway, checkout: new MockCheckout(orders, gateway, env.PAYMENT_CURRENCY, storefrontUrl) },
+    mock: {
+      gateway,
+      checkout: new MockCheckout(orders, gateway, env.PAYMENT_CURRENCY, storefrontUrl),
+    },
   };
 }

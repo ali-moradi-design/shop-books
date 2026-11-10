@@ -29,7 +29,12 @@ router.get(
   validate({ params: idParamSchema }),
   ctrl.getById,
 );
-router.post('/:id/checkout', requirePermission('orders:create'), validate({ params: idParamSchema }), ctrl.startCheckout);
+router.post(
+  '/:id/checkout',
+  requirePermission('orders:create'),
+  validate({ params: idParamSchema }),
+  ctrl.startCheckout,
+);
 router.post(
   '/:id/cancel',
   requireAnyPermission('orders:read-own', 'orders:read'),
@@ -37,7 +42,12 @@ router.post(
   ctrl.cancelOwn,
 );
 // staff only: customers pay through Stripe, and only Stripe's webhook marks those orders paid
-router.post('/:id/pay', requirePermission('orders:update-status'), validate({ params: idParamSchema }), ctrl.pay);
+router.post(
+  '/:id/pay',
+  requirePermission('orders:update-status'),
+  validate({ params: idParamSchema }),
+  ctrl.pay,
+);
 router.patch(
   '/:id/status',
   requirePermission('orders:update-status'),

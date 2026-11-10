@@ -49,7 +49,12 @@ publicAccountRoutes.post(
 publicAccountRoutes.post(
   '/guest',
   ...limited,
-  validate({ body: z.object({ name: z.string().trim().min(2).max(100), email: z.string().trim().email().max(200) }) }),
+  validate({
+    body: z.object({
+      name: z.string().trim().min(2).max(100),
+      email: z.string().trim().email().max(200),
+    }),
+  }),
   asyncHandler(async (req, res) => {
     // the storefront keeps these tokens in its own httpOnly cookies
     res.status(201).json(await accountService.startGuest(req.body));
@@ -84,7 +89,11 @@ accountRoutes.patch(
 accountRoutes.post(
   '/password',
   validate({
-    body: z.object({ currentPassword: z.string().min(1).max(128), newPassword: password, keepRefreshToken: z.string().max(200).optional() }),
+    body: z.object({
+      currentPassword: z.string().min(1).max(128),
+      newPassword: password,
+      keepRefreshToken: z.string().max(200).optional(),
+    }),
   }),
   asyncHandler(async (req, res) => {
     // the session that changed the password stays signed in
@@ -114,7 +123,9 @@ accountRoutes.put(
   '/addresses/:id',
   validate({ params: z.object({ id: addressId }), body: address }),
   asyncHandler(async (req, res) => {
-    res.json({ data: await accountService.updateAddress(req.user!.id, String(req.params.id), req.body) });
+    res.json({
+      data: await accountService.updateAddress(req.user!.id, String(req.params.id), req.body),
+    });
   }),
 );
 

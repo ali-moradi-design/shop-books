@@ -1,4 +1,5 @@
-export type DomainEventName = 'OrderPaid' | 'StockLow' | 'OrderShipped' | 'OrderCancelled' | 'StockRestored' | 'ReturnUpdated';
+export type DomainEventName =
+  'OrderPaid' | 'StockLow' | 'OrderShipped' | 'OrderCancelled' | 'StockRestored' | 'ReturnUpdated';
 
 export interface DomainEvent<T = unknown> {
   name: DomainEventName;
@@ -81,11 +82,15 @@ export function orderShippedEvent(payload: OrderChangedPayload): DomainEvent<Ord
   return { name: 'OrderShipped', occurredAt: new Date(), payload };
 }
 
-export function orderCancelledEvent(payload: OrderChangedPayload): DomainEvent<OrderChangedPayload> {
+export function orderCancelledEvent(
+  payload: OrderChangedPayload,
+): DomainEvent<OrderChangedPayload> {
   return { name: 'OrderCancelled', occurredAt: new Date(), payload };
 }
 
-export function stockRestoredEvent(payload: StockRestoredPayload): DomainEvent<StockRestoredPayload> {
+export function stockRestoredEvent(
+  payload: StockRestoredPayload,
+): DomainEvent<StockRestoredPayload> {
   return { name: 'StockRestored', occurredAt: new Date(), payload };
 }
 

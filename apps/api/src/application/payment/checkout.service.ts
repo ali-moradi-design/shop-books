@@ -8,7 +8,10 @@ import type { CheckoutLine, PaymentEvent, PaymentGateway, WebhookVerifier } from
 const log = logger.child({ module: 'payments' });
 
 /** Events that mean a Checkout Session has been paid. */
-const PAID_EVENTS = new Set(['checkout.session.completed', 'checkout.session.async_payment_succeeded']);
+const PAID_EVENTS = new Set([
+  'checkout.session.completed',
+  'checkout.session.async_payment_succeeded',
+]);
 
 export interface CheckoutUrls {
   storefrontUrl: string;
@@ -67,7 +70,9 @@ export class CheckoutService {
     try {
       event = this.verifier.verify(rawBody, signature);
     } catch (err) {
-      log.warn('webhook signature rejected', { error: err instanceof Error ? err.message : String(err) });
+      log.warn('webhook signature rejected', {
+        error: err instanceof Error ? err.message : String(err),
+      });
       throw new DomainError('Invalid webhook signature', 'VALIDATION');
     }
 
@@ -78,10 +83,16 @@ export class CheckoutService {
 
     const order = await this.findOrder(event);
     if (!order) {
-      log.warn('paid session without a matching order', { event: event.id, session: event.session.id });
+      log.warn('paid session without a matching order', {
+        event: event.id,
+        session: event.session.id,
+      });
       return;
     }
-    if (event.session.amountTotal !== order.totalAmount || event.session.currency !== this.config.currency) {
+    if (
+      event.session.amountTotal !== order.totalAmount ||
+      event.session.currency !== this.config.currency
+    ) {
       log.error('paid amount does not match the order', {
         event: event.id,
         order: order.id,
@@ -115,7 +126,9 @@ export class CheckoutService {
     const bySession = await this.orders.findByCheckoutSession(event.session.id);
     if (bySession) return bySession;
     // a newer session replaced this one on the order, but the customer paid the old one
-    return event.session.orderId ? this.orders.findById(event.session.orderId).catch(() => null) : null;
+    return event.session.orderId
+      ? this.orders.findById(event.session.orderId).catch(() => null)
+      : null;
   }
 
   private async forgetSession(event: PaymentEvent): Promise<void> {

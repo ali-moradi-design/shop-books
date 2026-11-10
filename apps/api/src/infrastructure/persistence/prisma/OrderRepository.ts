@@ -52,7 +52,10 @@ export class PrismaOrderRepository implements IOrderRepository {
   }
 
   async findByCheckoutSession(sessionId: string): Promise<Order | null> {
-    const row = await getPrisma().order.findFirst({ where: { checkoutSessionId: sessionId, deletedAt: null }, include: itemsInclude });
+    const row = await getPrisma().order.findFirst({
+      where: { checkoutSessionId: sessionId, deletedAt: null },
+      include: itemsInclude,
+    });
     return row ? mapOrder(row) : null;
   }
 

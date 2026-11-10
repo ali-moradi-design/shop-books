@@ -4,6 +4,7 @@ import './globals.css';
 import { SiteHeader } from '@/widgets/header';
 import { SiteFooter } from '@/widgets/footer';
 import { SITE } from '@/shared/config';
+import { Analytics } from '@/shared/ui/Analytics';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
 const sourceSerif = Source_Serif_4({
@@ -31,6 +32,20 @@ export const metadata: Metadata = {
   },
   twitter: { card: 'summary_large_image', title: SITE.name, description: SITE.tagline },
   formatDetection: { telephone: false, address: false, email: false },
+  // kept out of every search engine: the X-Robots-Tag header (next.config.ts) says the same for files and images
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true,
+      'max-snippet': 0,
+      'max-image-preview': 'none',
+      'max-video-preview': 0,
+    },
+  },
 };
 
 export const viewport: Viewport = {
@@ -51,6 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         >
           Skip to content
         </a>
+        <Analytics />
         <SiteHeader />
         <main id="main" className="mx-auto w-full max-w-shop flex-1 px-6 py-10">
           {children}

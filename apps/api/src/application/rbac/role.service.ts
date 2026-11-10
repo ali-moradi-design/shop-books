@@ -26,9 +26,11 @@ export class RoleService {
     const role = await this.roles.findById(id, false);
     if (!role || !BUILT_IN.includes(role.name)) return;
     if (!input) throw new AppError(`The ${role.name} role is built in and cannot be deleted`, 400);
-    if (input.name !== undefined && input.name !== role.name) throw new AppError(`The ${role.name} role cannot be renamed`, 400);
+    if (input.name !== undefined && input.name !== role.name)
+      throw new AppError(`The ${role.name} role cannot be renamed`, 400);
     // removing the admin role's permissions would lock everyone out of the admin area
-    if (role.name === 'admin' && input.permissions !== undefined) throw new AppError("The admin role's permissions cannot be changed", 400);
+    if (role.name === 'admin' && input.permissions !== undefined)
+      throw new AppError("The admin role's permissions cannot be changed", 400);
   }
 
   async update(id: string, input: UpdateRoleInput) {
